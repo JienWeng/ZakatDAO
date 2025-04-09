@@ -11,35 +11,6 @@ This platform implements a transparent Zakat management system with:
 - QR code enabled vouchers
 - Real-time usage tracking
 
-## Project Structure
-
-```
-GiveNGo/
-├── app.py                 # Main Flask application
-├── ai_disbursement.py    # AI-powered fund distribution logic
-├── tng_integration.py    # Touch 'n Go eWallet integration
-├── data/                 # Data storage directory
-│   ├── ledger.csv       # Blockchain-style transaction ledger
-│   ├── usage.csv        # Voucher usage tracking
-│   └── recipients.json  # Recipient information database
-├── static/              # Static assets
-│   └── mosque.png      # Hero image for landing page
-├── templates/           # HTML templates
-│   ├── admin_dashboard.html
-│   ├── admin_ai_disbursement.html
-│   ├── admin_login.html
-│   ├── admin_recipients.html
-│   ├── confirmation.html
-│   ├── disburse_form.html
-│   ├── donate_form.html
-│   ├── index.html
-│   ├── ledger.html
-│   ├── voucher_details.html
-│   └── voucher_not_found.html
-├── requirements.txt     # Python dependencies
-└── TROUBLESHOOTING.md  # Troubleshooting guide
-```
-
 ## Features
 
 ### 1. Blockchain-Style Ledger
