@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Public Ledger - Zakat DAO</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="/static/js/blockchain-viz.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="/static/js/chain-explorer.js"></script>
+    <style>
+        .transaction-hash {
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+        .table-responsive {
+            overflow-x: auto;
+        }
+        .hash-link {
+            color: #6c757d;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .hash-link:hover {
+            color: #0d6efd;
+        }
+        .transaction-in {
+            border-left: 4px solid #198754;
+        }
+        .transaction-out {
+            border-left: 4px solid #0d6efd;
+        }
+        .filter-form {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        #blockchain-viz {
+            width: 100%;
+            height: 60vh;
+            background: linear-gradient(to bottom, #1a1a1a, #000000);
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+        .block-info {
+            position: absolute;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+        }
+        .chain-container {
+            position: relative;
+            height: 500px;
+            width: 100%;
+            background-color: #f8f8f8;
+            border: 2px solid #ddd;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        .chain-tooltip {
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            pointer-events: none;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(5px);
+            max-width: 250px;
+            line-height: 1.4;
+        }
+        .ledger-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .debug-info {
+            font-family: monospace;
+            color: #666;
+        }
+        .loading-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 16px;
+            color: #666;
+        }
+        .blockchain-tooltip {
+            background: rgba(33, 33, 33, 0.9);
+            color: white;
+            padding: 12px 16px;
+            font-family: 'Arial', sans-serif;
+            line-height: 1.4;
+            border-left: 4px solid #f57c00;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="/">Zakat DAO</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/donate">Donate</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/ledger">Public Ledger</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <h1 class="mb-3">Public Transaction Ledger</h1>
+        <p class="lead mb-4">This ledger provides complete transparency of all donations and disbursements.</p>
+        
+        <!-- Blockchain Visualization -->
+        <h3>Interactive Blockchain Viewer</h3>
+        <div id="blockchain-viewer" class="chain-container">
+            <div class="loading-message">Loading blockchain visualization...</div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="ledger-stats">
+            <div class="stat-card">
+                <h6 class="text-muted mb-1">Total Donations</h6>
+                <h4>{{ format_amount(total_donated) }}</h4>
+            </div>
+            <div class="stat-card">
+                <h6 class="text-muted mb-1">Total Disbursed</h6>
+                <h4>{{ format_amount(total_disbursed) }}</h4>
+            </div>
+            <div class="stat-card">
+                <h6 class="text-muted mb-1">Active Blocks</h6>
+                <h4>{{ transactions|length }}</h4>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filter-form">
+            <h5>Filter Transactions</h5>
+            <form method="GET" action="/ledger" class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Transaction Type</label>
+                    <select name="type" class="form-select">
+                        <option value="">All Types</option>
+                        <option value="IN" {% if filters.transaction_type == 'IN' %}selected{% endif %}>Donations (IN)</option>
+                        <option value="OUT" {% if filters.transaction_type == 'OUT' %}selected{% endif %}>Disbursements (OUT)</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Voucher ID</label>
+                    <input type="text" name="voucher" class="form-control" placeholder="Enter voucher ID" value="{{ filters.voucher_code or '' }}">
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">Apply Filters</button>
+                    <a href="/ledger" class="btn btn-outline-secondary ms-2">Clear Filters</a>
+                </div>
+            </form>
+        </div>
+        
+        <div class="row mb-5">
+            <div class="col-md-6">
+                <div class="card bg-light h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Platform Statistics</h5>
+                        <div class="row mt-3">
+                            <div class="col-6">
+                                <h3 class="text-success">${{ "%.2f"|format(total_donated) }}</h3>
+                                <p class="text-muted mb-0">Total Donations</p>
+                            </div>
+                            <div class="col-6">
+                                <h3 class="text-primary">${{ "%.2f"|format(total_disbursed) }}</h3>
+                                <p class="text-muted mb-0">Total Disbursed</p>
+                            </div>
+                        </div>
+                        <div class="progress mt-3" style="height: 20px;">
+                            {% set disbursement_percentage = (total_disbursed / total_donated * 100) if total_donated > 0 else 0 %}
+                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ disbursement_percentage }}%" aria-valuenow="{{ disbursement_percentage }}" aria-valuemin="0" aria-valuemax="100">{{ "%.1f"|format(disbursement_percentage) }}%</div>
+                        </div>
+                        <small class="text-muted">Disbursement rate: {{ "%.1f"|format(disbursement_percentage) }}%</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="mb-0">Zakat Collection Statistics</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-sm mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Zakat Type</th>
+                                        <th>Collected</th>
+                                        <th>Disbursed</th>
+                                        <th>Available</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for id, stats in zakat_stats.items() %}
+                                    {% if stats.collected > 0 %}
+                                    <tr>
+                                        <td>{{ stats.name }}</td>
+                                        <td>{{ format_amount(stats.collected) }}</td>
+                                        <td>{{ format_amount(stats.disbursed) }}</td>
+                                        <td>{{ format_amount(stats.available) }}</td>
+                                    </tr>
+                                    {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <h2 class="mb-3">Transaction History</h2>
+        <p>Displaying {{ transactions|length }} transactions</p>
+        
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Blockchain-Style Ledger</h5>
+                <a href="/api/ledger.json" class="btn btn-sm btn-outline-secondary" target="_blank">JSON API</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Transaction ID</th>
+                                <th>Type</th>
+                                <th>Date</th>
+                                <th>Zakat Type</th>
+                                <th>Amount</th>
+                                <th>User</th>
+                                <th>Voucher ID</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if transactions %}
+                                {% for tx in transactions %}
+                                <tr class="{% if tx.transaction_type == 'IN' %}transaction-in{% elif tx.transaction_type == 'OUT' %}transaction-out{% else %}transaction-in{% endif %}">
+                                    <td>
+                                        <span class="badge bg-secondary">{{ tx.transaction_id or 'N/A' }}</span>
+                                    </td>
+                                    <td>
+                                        {% if tx.transaction_type == 'IN' %}
+                                        <span class="badge bg-success">IN</span>
+                                        {% elif tx.transaction_type == 'OUT' %}
+                                        <span class="badge bg-primary">OUT</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">LEGACY</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ tx.timestamp or 'N/A' }}</td>
+                                    <td>{{ tx.zakat_type_name or 'N/A' }}</td>
+                                    <td>{{ format_amount(tx.amount|float) if tx.amount else 'RM 0.00' }}</td>
+                                    <td>{{ tx.user or 'Anonymous' }}</td>
+                                    <td>
+                                        {% if tx.voucher_code %}
+                                        <a href="/voucher/{{ tx.voucher_code }}" class="hash-link">
+                                            <span class="text-truncate d-inline-block" style="max-width: 150px;">{{ tx.voucher_code }}</span>
+                                        </a>
+                                        {% else %}
+                                        -
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="7" class="text-center py-4">No transactions found matching your filters.</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-5">
+            <h3>About Our Blockchain-Style Ledger</h3>
+            <p>The Zakat DAO ledger is designed to provide maximum transparency and traceability for all donations:</p>
+            
+            <div class="row mt-4">
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">🔐 Immutable Records</h5>
+                            <p class="card-text">All donations and disbursements are recorded in an append-only ledger, ensuring that records cannot be altered after they are created.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">🔍 Full Traceability</h5>
+                            <p class="card-text">Every donation can be traced from donor to recipient using unique voucher IDs and transaction hashes.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">🌐 Open Access</h5>
+                            <p class="card-text">The entire ledger is publicly viewable by anyone, at any time, ensuring complete transparency and accountability.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-light py-4 mt-5">
+        <div class="container text-center">
+            <p>© 2023 Zakat DAO. This platform simulates blockchain/DAO behavior but does not use actual cryptocurrency.</p>
+            <p><small>All donations are tracked in a transparent ledger system.</small></p>
+        </div>
+    </footer>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("DOM loaded, initializing blockchain visualization");
+            
+            // Create new instance with clear ID
+            const viewer = new ChainExplorer('blockchain-viewer');
+            
+            // Fetch data with clear error handling
+            fetch('/api/ledger.json')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Network response failed with status ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log("Data received:", data);
+                    if (data && data.transactions && data.transactions.length > 0) {
+                        viewer.update(data.transactions);
+                    } else {
+                        throw new Error("No transactions data available");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error loading blockchain data:", error);
+                    document.querySelector('#blockchain-viewer .loading-message').innerHTML = 
+                        `Failed to load blockchain data: ${error.message}`;
+                });
+        });
+    </script>
+</body>
+</html>

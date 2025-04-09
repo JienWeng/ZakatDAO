@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proposal Details - Zakat DAO</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    {% include 'nav.html' %}
+
+    <div class="container py-5">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">
+                    {% if proposal.type == 'allocation' %}
+                    Allocation Proposal #{{ proposal.id[:8] }}
+                    {% else %}
+                    Disbursement Proposal #{{ proposal.id[:8] }}
+                    {% endif %}
+                </h3>
+                <span class="badge bg-{{ proposal.status == 'active' and 'primary' or (proposal.status == 'approved' and 'success' or 'danger') }}">
+                    {{ proposal.status|title }}
+                </span>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <dl>
+                            {% if proposal.type == 'allocation' %}
+                            <dt>Type</dt>
+                            <dd>{{ proposal.allocation_type|title }} Allocation</dd>
+                            
+                            <dt>Current State</dt>
+                            <dd>
+                                {% for key, value in proposal.current_state.items() %}
+                                <div>{{ key|title }}: {{ value.percentage }}%</div>
+                                {% endfor %}
+                            </dd>
+                            
+                            <dt>Proposed Changes</dt>
+                            <dd>
+                                {% for key, value in proposal.proposed_changes.items() %}
+                                <div>
+                                    {{ key|title }}: {{ value.percentage }}%
+                                    <small class="text-muted d-block">
+                                        Categories: {{ value.categories|join(', ') }}
+                                    </small>
+                                </div>
+                                {% endfor %}
+                            </dd>
+                            {% else %}
+                            <dt>Recipient</dt>
+                            <dd>{{ proposal.disbursement_data.user }}</dd>
+                            
+                            <dt>Amount</dt>
+                            <dd>{{ format_amount(proposal.disbursement_data.amount) }}</dd>
+                            
+                            <dt>Notes</dt>
+                            <dd>{{ proposal.disbursement_data.notes or 'No notes provided' }}</dd>
+                            {% endif %}
+                        </dl>
+                    </div>
+                    <div class="col-md-6">
+                        <dl>
+                            <dt>Created By</dt>
+                            <dd>{{ proposal.created_by }}</dd>
+                            
+                            <dt>Created At</dt>
+                            <dd>{{ proposal.created_at }}</dd>
+                            
+                            <dt>Expires At</dt>
+                            <dd>{{ proposal.expires_at }}</dd>
+                        </dl>
+                    </div>
+                </div>
+
+                <!-- Voting Section -->
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h5>Votes</h5>
+                        
+                        <!-- Vote Progress -->
+                        <div class="mb-3">
+                            <div class="progress" style="height: 25px;">
+                                {% set authority_votes = proposal.votes.authorities|length %}
+                                {% set donor_votes = proposal.votes.donors|length %}
+                                {% set total_votes = authority_votes + donor_votes %}
+                                
+                                {% set authority_approves = proposal.votes.authorities|selectattr('vote', 'equalto', 'approve')|list|length %}
+                                {% set donor_approves = proposal.votes.donors|selectattr('vote', 'equalto', 'approve')|list|length %}
+                                
+                                {% set authority_ratio = authority_approves / authority_votes if authority_votes > 0 else 0 %}
+                                {% set donor_ratio = donor_approves / donor_votes if donor_votes > 0 else 0 %}
+                                
+                                {% set weighted_approval = (
+                                    (authority_ratio * 0.5 + donor_ratio * 0.5) * 100
+                                ) if total_votes > 0 else 0 %}
+                                
+                                <div class="progress-bar bg-success" 
+                                     style="width: {{ weighted_approval }}%" 
+                                     role="progressbar">
+                                    {{ "%.1f"|format(weighted_approval) }}% Approval
+                                </div>
+                            </div>
+                            <small class="text-muted">
+                                {{ total_votes }} total votes ({{ authority_votes }} authorities, {{ donor_votes }} donors)
+                            </small>
+                        </div>
+
+                        <!-- Vote Actions -->
+                        {% if proposal.status == 'active' and (is_admin or is_donor) %}
+                        <form method="POST" action="{{ url_for('vote_on_proposal', proposal_id=proposal.id) }}" class="d-flex gap-2">
+                            <button type="submit" name="vote" value="approve" class="btn btn-success">
+                                Approve
+                            </button>
+                            <button type="submit" name="vote" value="reject" class="btn btn-danger">
+                                Reject
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

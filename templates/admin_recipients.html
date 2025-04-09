@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipients Management - Zakat DAO</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/admin">Zakat DAO Admin</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/disburse">Manual Disbursement</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/ai-disbursement">AI Disbursement</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/admin/recipients">Recipients</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/ledger">View Ledger</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Recipients Management</h1>
+            <a href="#" class="btn btn-success">Add New Recipient</a>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h6 class="card-title">Total Recipients</h6>
+                        <h3>{{ recipients|length }}</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h6 class="card-title">High Priority (≥8)</h6>
+                        <h3>{{ recipients|selectattr('priority_base', '>=', 8.0)|list|length }}</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h6 class="card-title">Medium Priority (5-8)</h6>
+                        <h3>{{ recipients|selectattr('priority_base', '>=', 5.0)|selectattr('priority_base', '<', 8.0)|list|length }}</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h6 class="card-title">Low Priority (<5)</h6>
+                        <h3>{{ recipients|selectattr('priority_base', '<', 5.0)|list|length }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% for category, recipients in recipients_by_category.items() %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">{{ category }}</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Family Size</th>
+                                <th>Monthly Income</th>
+                                <th>Priority Base</th>
+                                <th>Last Disbursement</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for recipient in recipients %}
+                            <tr>
+                                <td>{{ recipient.id }}</td>
+                                <td>{{ recipient.name }}</td>
+                                <td>{{ recipient.family_size }}</td>
+                                <td>RM {{ "%.2f"|format(recipient.monthly_income) }}</td>
+                                <td>
+                                    {% if recipient.priority_base >= 8.0 %}
+                                    <span class="badge bg-danger">High ({{ "%.1f"|format(recipient.priority_base) }})</span>
+                                    {% elif recipient.priority_base >= 5.0 %}
+                                    <span class="badge bg-warning">Medium ({{ "%.1f"|format(recipient.priority_base) }})</span>
+                                    {% else %}
+                                    <span class="badge bg-info">Low ({{ "%.1f"|format(recipient.priority_base) }})</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ recipient.last_disbursement or 'Never' }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary">View History</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

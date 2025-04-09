@@ -1,0 +1,90 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+        <a class="navbar-brand" href="/" data-translate="zakat_dao">Zakat DAO</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/ledger" data-translate="public_ledger">Public Ledger</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="daoDropdown" role="button" 
+                       data-bs-toggle="dropdown" aria-expanded="false" data-translate="dao_governance">
+                        DAO Governance
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/dao" data-translate="dashboard">Dashboard</a></li>
+                        <li><a class="dropdown-item" href="/dao/proposals" data-translate="proposals">Proposals</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="/dao/allocations" data-translate="fund_allocations">Fund Allocations</a></li>
+                        {% if is_admin %}
+                        <li><a class="dropdown-item" href="/dao/allocations/propose" data-translate="propose_allocation">Propose Allocation</a></li>
+                        {% endif %}
+                    </ul>
+                </li>
+                {% if is_admin %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" 
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        Admin
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/admin" data-translate="admin_dashboard">Dashboard</a></li>
+                        <li><a class="dropdown-item" href="/admin/recipients" data-translate="recipients">Recipients</a></li>
+                        <li><a class="dropdown-item" href="/admin/ai-disbursement" data-translate="ai_disbursement">AI Disbursement</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="/disburse" data-translate="manual_disbursement">Manual Disbursement</a></li>
+                    </ul>
+                </li>
+                {% endif %}
+            </ul>
+            <ul class="navbar-nav">
+                {% if not is_admin and not is_donor %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="loginDropdown" 
+                           data-bs-toggle="dropdown" aria-expanded="false" data-translate="login_as">
+                            Login As
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="/admin/login" data-translate="authority_login">
+                                <i class="bi bi-shield-lock"></i> Authority Login
+                            </a></li>
+                            <li><a class="dropdown-item" href="/dao" data-translate="donor_dao_portal">
+                                <i class="bi bi-person"></i> Donor DAO Portal
+                            </a></li>
+                        </ul>
+                    </li>
+                {% else %}
+                    {% if is_admin %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/logout" data-translate="logout">Logout</a>
+                        </li>
+                    {% elif is_donor %}
+                        <li class="nav-item">
+                            <span class="nav-link">{{ session.donor_id }}</span>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/donor/logout" data-translate="logout">Logout</a>
+                        </li>
+                    {% endif %}
+                {% endif %}
+                <!-- Language Toggle Button -->
+                <li class="nav-item dropdown language-selector">
+                    <a class="nav-link dropdown-toggle" href="#" id="languageToggle" 
+                       role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-globe"></i> <span id="currentLang">EN</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageToggle">
+                        <li><a class="dropdown-item language-option" href="#" data-lang="en">English</a></li>
+                        <li><a class="dropdown-item language-option" href="#" data-lang="my">Bahasa Malaysia</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Include translation script -->
+{% include 'translation.html' %}

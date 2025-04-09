@@ -1,0 +1,66 @@
+[
+  {
+    "recipient_id": "RCP001",
+    "amount": 50.0,
+    "voucher_code": "TNG-a77badad",
+    "timestamp": "2025-04-09T10:04:57.606829",
+    "status": "SUCCESS",
+    "tng_reference": "TNG20250409100457"
+  },
+  {
+    "recipient_id": "RCP013",
+    "amount": 30.0,
+    "voucher_code": "TNG-f5d5bd71",
+    "timestamp": "2025-04-09T10:04:57.607948",
+    "status": "SUCCESS",
+    "tng_reference": "TNG20250409100457"
+  },
+  {
+    "recipient_id": "RCP001",
+    "amount": 680.0,
+    "voucher_code": "TNG-d1fa0bc9",
+    "timestamp": "2025-04-09T10:25:39.094120",
+    "status": "SUCCESS",
+    "tng_reference": "TNG20250409102539"
+  },
+  {
+    "recipient_id": "RCP001",
+    "amount": 120.0,
+    "voucher_code": "TNG-a2b3bed0",
+    "timestamp": "2025-04-09T10:28:29.984050",
+    "status": "SUCCESS",
+    "tng_reference": "TNG20250409102829"
+  },
+  {
+    "recipient_id": "RCP001",
+    "amount": 184.0,
+    "voucher_code": "TNG-41c84978",
+    "timestamp": "2025-04-09T10:31:57.088929",
+    "status": "SUCCESS",
+    "tng_reference": "TNG20250409103157"
+  },
+  {
+    "recipient_id": "RCP001",
+    "amount": 120.0,
+    "voucher_code": "f513327e-c187-4a55-86d4-6bf101b19e3e",
+    "timestamp": "2025-04-09T10:38:38.131406",
+    "status": "SUCCESS",
+    "tng_reference": "TNG20250409103838"
+  },
+  {
+    "recipient_id": "RCP003",
+    "amount": 498.0,
+    "voucher_code": "35d1f5be-0a35-487b-a545-5a532b746ec7",
+    "timestamp": "2025-04-09T11:47:44.821555",
+    "status": "SUCCESS",
+    "tng_reference": "TNG20250409114744"
+  },
+  {
+    "recipient_id": "RCP002",
+    "amount": 807.0,
+    "voucher_code": "4d584faf-2860-43a5-8be4-b745327e1290",
+    "timestamp": "2025-04-09T11:49:08.341878",
+    "status": "SUCCESS",
+    "tng_reference": "TNG20250409114908"
+  }
+]

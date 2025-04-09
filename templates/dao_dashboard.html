@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DAO Governance - Zakat DAO</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    {% include 'nav.html' %}
+
+    <div class="container py-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>DAO Governance Dashboard</h1>
+            <div>
+                {% if not is_donor and not is_admin %}
+                    <a href="{{ url_for('donor_login') }}" class="btn btn-outline-primary">Donor Login</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="alert alert-info">
+            <h4 class="alert-heading">About DAO Governance</h4>
+            <p>Zakat DAO uses a hybrid governance model where:</p>
+            <ul>
+                <li>Authority votes have 50% weight</li>
+                <li>Donor votes have 50% collective weight</li>
+                <li>Minimum 3 votes required for decisions</li>
+                <li>24-hour voting window</li>
+                <li>60% approval threshold required</li>
+            </ul>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Active Proposals</h5>
+            </div>
+            <div class="card-body">
+                {% if proposals %}
+                    <div class="list-group">
+                        {% for id, proposal in proposals.items() %}
+                            <a href="{{ url_for('view_proposal', proposal_id=id) }}" 
+                               class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h5 class="mb-1">
+                                        {% if proposal.type == 'allocation' %}
+                                            {{ proposal.allocation_type|title }} Allocation Proposal
+                                        {% else %}
+                                            Disbursement to {{ proposal.disbursement_data.user }}
+                                        {% endif %}
+                                    </h5>
+                                    <small>
+                                        Expires: {{ proposal.expires_at }}
+                                    </small>
+                                </div>
+                                <p class="mb-1">
+                                    {% if proposal.type == 'allocation' %}
+                                        Policy change proposal for {{ proposal.allocation_type }} distributions
+                                    {% else %}
+                                        Amount: {{ format_amount(proposal.disbursement_data.amount) }}
+                                    {% endif %}
+                                </p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small>
+                                        Created by: {{ proposal.created_by }}
+                                    </small>
+                                    <span class="badge bg-primary">
+                                        {{ proposal.votes.authorities|length + proposal.votes.donors|length }} votes
+                                    </span>
+                                </div>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted mb-0">No active proposals at this time.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if is_admin %}
+            <div class="text-end">
+                <div class="btn-group">
+                    <a href="{{ url_for('disburse_funds') }}" class="btn btn-primary">
+                        Create Disbursement Proposal
+                    </a>
+                    <a href="{{ url_for('propose_allocation') }}" class="btn btn-outline-primary">
+                        Create Allocation Proposal
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disburse Funds - Zakat DAO Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/admin">Zakat DAO Admin</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/disburse">New Disbursement</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/ledger" target="_blank">View Ledger</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Disburse Funds</h1>
+            <a href="/admin" class="btn btn-outline-secondary">&larr; Back to Dashboard</a>
+        </div>
+        
+        <div class="alert alert-info">
+            <strong>Note:</strong> This form initiates a DAO voting process for fund disbursement. Both authorities and donors will need to approve the disbursement before it is executed.
+        </div>
+        
+        <div class="card">
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('disburse_funds') }}">
+                    <div class="mb-3">
+                        <label for="zakat_type_id" class="form-label">Zakat Type</label>
+                        <select class="form-select" id="zakat_type_id" name="zakat_type_id" required>
+                            <option value="" selected disabled>Select zakat type...</option>
+                            {% for zakat_type in zakat_types %}
+                            <option value="{{ zakat_type.id }}">{{ zakat_type.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="amount" class="form-label">Disbursement Amount (RM)</label>
+                        <div class="input-group">
+                            <span class="input-group-text">RM</span>
+                            <input type="number" class="form-control" id="amount" name="amount" 
+                                   min="1" step="0.01" required placeholder="Enter amount">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="recipient_id" class="form-label">Recipient</label>
+                        <select class="form-select" id="recipient_id" name="recipient" required>
+                            <option value="" selected disabled>Select recipient...</option>
+                            {% for category, recipients in recipients_by_category.items() %}
+                            <optgroup label="{{ category }}">
+                                {% for recipient in recipients %}
+                                <option value="{{ recipient.id }}" data-category="{{ recipient.category_name }}">
+                                    {{ recipient.name }} ({{ recipient.category_name }})
+                                </option>
+                                {% endfor %}
+                            </optgroup>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">Disbursement Notes</label>
+                        <textarea class="form-control" id="notes" name="notes" rows="3" 
+                            placeholder="Enter reason for disbursement and any special considerations"></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="voucher_code" class="form-label">Source Voucher (Optional)</label>
+                        <input type="text" class="form-control" id="voucher_code" name="voucher_code" 
+                            value="{{ voucher_code or '' }}"
+                            placeholder="Enter voucher ID to disburse from specific donation">
+                        <div class="form-text">If not specified, the oldest matching voucher will be used.</div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Submit for DAO Approval</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-light py-4 mt-5">
+        <div class="container text-center">
+            <p>© 2023 Zakat DAO Admin Portal</p>
+            <p><small>This is a simulation. In a real DAO, fund disbursement would require multi-signature approval.</small></p>
+        </div>
+    </footer>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

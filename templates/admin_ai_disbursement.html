@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Disbursement - Zakat DAO Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/admin">Zakat DAO Admin</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/disburse">Manual Disbursement</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/admin/ai-disbursement">AI Disbursement</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/recipients">Recipients</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/ledger" target="_blank">View Ledger</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>AI-Powered Disbursement</h1>
+            <a href="/admin" class="btn btn-outline-secondary">&larr; Back to Dashboard</a>
+        </div>
+        
+        <div class="alert alert-info">
+            <strong>How it works:</strong> Our AI system uses a sophisticated algorithm to determine the optimal allocation of funds based on recipient need, urgency, family size, and other factors. The system aims to distribute funds fairly and efficiently across all eligible recipients.
+        </div>
+        
+        <div class="row mb-5">
+            <div class="col-md-6">
+                <div class="card bg-light h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Available Funds</h5>
+                        <div class="mt-3">
+                            <h3 class="text-success">${{ "%.2f"|format(available_funds.total_available) }}</h3>
+                            <p class="text-muted mb-0">Total funds available for disbursement</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card bg-light h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Eligible Recipients</h5>
+                        <div class="mt-3">
+                            <h3 class="text-primary">{{ recipients_count }}</h3>
+                            <p class="text-muted mb-0">Recipients in the database</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Run AI Disbursement</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('admin_ai_disbursement') }}" class="row g-3">
+                    <div class="col-md-6">
+                        <label for="max_amount" class="form-label">Maximum Amount to Disburse</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" class="form-control" id="max_amount" name="max_amount" 
+                                   placeholder="Leave blank to use default (80% of available funds)"
+                                   min="1" step="0.01" max="{{ available_funds.total_available }}">
+                        </div>
+                        <div class="form-text">Maximum amount to disburse. Default is 80% of available funds.</div>
+                    </div>
+                    
+                    <div class="col-12">
+                        <button type="submit" name="action" value="simulate" class="btn btn-outline-primary">
+                            Simulate Disbursement
+                        </button>
+                        <button type="submit" name="action" value="disburse" class="btn btn-success" 
+                                onclick="return confirm('Are you sure you want to proceed with this disbursement? This action cannot be undone.')">
+                            Execute Disbursement
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        {% if simulation_results %}
+        <div class="card mb-4 border-primary">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Simulation Results</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <strong>This is a simulation.</strong> No actual disbursements have been made.
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="card border-success">
+                            <div class="card-body text-center">
+                                <h3 class="text-success">${{ "%.2f"|format(simulation_results.total_disbursed) }}</h3>
+                                <p class="mb-0">Would be disbursed</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-primary">
+                            <div class="card-body text-center">
+                                <h3 class="text-primary">{{ simulation_results.recipients_count }}</h3>
+                                <p class="mb-0">Recipients would benefit</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-secondary">
+                            <div class="card-body text-center">
+                                <h3 class="text-secondary">${{ "%.2f"|format(simulation_results.remaining_funds) }}</h3>
+                                <p class="mb-0">Would remain in fund</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <h5>Simulated Disbursements</h5>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Recipient ID</th>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Priority Score</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for disbursement in simulation_results.disbursements %}
+                            <tr>
+                                <td>{{ disbursement.recipient_id }}</td>
+                                <td>{{ disbursement.recipient_name }}</td>
+                                <td>{{ disbursement.category }}</td>
+                                <td>{{ "%.2f"|format(disbursement.priority_score) }}</td>
+                                <td>${{ "%.2f"|format(disbursement.amount) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="mt-4">
+                    <form method="POST" action="{{ url_for('admin_ai_disbursement') }}">
+                        <input type="hidden" name="max_amount" value="{{ simulation_results.total_disbursed }}">
+                        <button type="submit" name="action" value="disburse" class="btn btn-success" 
+                                onclick="return confirm('Are you sure you want to proceed with this disbursement? This action cannot be undone.')">
+                            Execute This Disbursement Plan
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if disbursement_results %}
+        <div class="card mb-4 border-success">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">Disbursement Complete</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-success">
+                    <strong>Success!</strong> The AI has successfully disbursed funds to recipients.
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="card border-success">
+                            <div class="card-body text-center">
+                                <h3 class="text-success">${{ "%.2f"|format(disbursement_results.total_disbursed) }}</h3>
+                                <p class="mb-0">Total amount disbursed</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-primary">
+                            <div class="card-body text-center">
+                                <h3 class="text-primary">{{ disbursement_results.recipients_count }}</h3>
+                                <p class="mb-0">Recipients benefited</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-secondary">
+                            <div class="card-body text-center">
+                                <h3 class="text-secondary">${{ "%.2f"|format(disbursement_results.remaining_funds) }}</h3>
+                                <p class="mb-0">Remaining in fund</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <h5>Completed Disbursements</h5>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Recipient ID</th>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Priority Score</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for disbursement in disbursement_results.disbursements %}
+                            <tr>
+                                <td>{{ disbursement.recipient_id }}</td>
+                                <td>{{ disbursement.recipient_name }}</td>
+                                <td>{{ disbursement.category }}</td>
+                                <td>{{ "%.2f"|format(disbursement.priority_score) }}</td>
+                                <td>${{ "%.2f"|format(disbursement.amount) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="mt-4">
+                    <a href="/ledger" class="btn btn-primary" target="_blank">View Transactions in Ledger</a>
+                    <a href="/admin/recipients" class="btn btn-outline-primary">View Recipients</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">About AI Disbursement</h5>
+            </div>
+            <div class="card-body">
+                <p>The AI-powered disbursement system works by evaluating all eligible recipients based on multiple factors:</p>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Priority Calculation Factors:</h6>
+                        <ul>
+                            <li><strong>Recipient category</strong> (Fakir, Miskin, etc.)</li>
+                            <li><strong>Need level</strong> (1-10 scale)</li>
+                            <li><strong>Urgency</strong> (1-10 scale)</li>
+                            <li><strong>Family size</strong> (number of dependents)</li>
+                            <li><strong>Special circumstances</strong> (medical needs, etc.)</li>
+                            <li><strong>Previous support received</strong> (less support = higher priority)</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Benefits of AI Disbursement:</h6>
+                        <ul>
+                            <li>Objective, data-driven allocation of funds</li>
+                            <li>Efficient processing of many recipients</li>
+                            <li>Transparent, rule-based decision making</li>
+                            <li>Fair distribution based on need</li>
+                            <li>Complete audit trail in the ledger</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-light py-4 mt-5">
+        <div class="container text-center">
+            <p>© 2023 Zakat DAO Admin Portal</p>
+            <p><small>This is a simulation. In a real DAO, fund disbursement would require multi-signature approval.</small></p>
+        </div>
+    </footer>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

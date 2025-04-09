@@ -1,0 +1,98 @@
+{
+  "asnaf": {
+    "fakir": {
+      "percentage": 25,
+      "categories": [
+        "groceries",
+        "medical",
+        "education"
+      ]
+    },
+    "miskin": {
+      "percentage": 25,
+      "categories": [
+        "groceries",
+        "medical",
+        "education"
+      ]
+    },
+    "amil": {
+      "percentage": 12.5,
+      "categories": [
+        "operational"
+      ]
+    },
+    "muallaf": {
+      "percentage": 12.5,
+      "categories": [
+        "education",
+        "religious"
+      ]
+    },
+    "riqab": {
+      "percentage": 6.25,
+      "categories": [
+        "education",
+        "skills"
+      ]
+    },
+    "gharimin": {
+      "percentage": 6.25,
+      "categories": [
+        "debt_relief"
+      ]
+    },
+    "fisabilillah": {
+      "percentage": 6.25,
+      "categories": [
+        "religious",
+        "education"
+      ]
+    },
+    "ibnu_sabil": {
+      "percentage": 6.25,
+      "categories": [
+        "travel",
+        "emergency"
+      ]
+    }
+  },
+  "usage_categories": {
+    "groceries": {
+      "priority": 1,
+      "description": "Basic food and household items"
+    },
+    "medical": {
+      "priority": 2,
+      "description": "Healthcare and medicine"
+    },
+    "education": {
+      "priority": 3,
+      "description": "School fees and supplies"
+    },
+    "skills": {
+      "priority": 4,
+      "description": "Vocational training"
+    },
+    "religious": {
+      "priority": 5,
+      "description": "Religious education"
+    },
+    "operational": {
+      "priority": 6,
+      "description": "Administrative costs"
+    },
+    "debt_relief": {
+      "priority": 7,
+      "description": "Debt assistance"
+    },
+    "travel": {
+      "priority": 8,
+      "description": "Travel assistance"
+    },
+    "emergency": {
+      "priority": 9,
+      "description": "Emergency aid"
+    }
+  }
+}

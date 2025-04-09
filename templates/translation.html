@@ -1,0 +1,214 @@
+<script>
+    // Global translation dictionary with common terms
+    const translations = {
+        'en': {
+            // Navigation
+            'zakat_dao': 'Zakat DAO',
+            'home': 'Home',
+            'public_ledger': 'Public Ledger',
+            'donate': 'Donate',
+            'dao_governance': 'DAO Governance',
+            'dashboard': 'Dashboard',
+            'proposals': 'Proposals',
+            'fund_allocations': 'Fund Allocations',
+            'propose_allocation': 'Propose Allocation',
+            'admin': 'Admin',
+            'recipients': 'Recipients',
+            'ai_disbursement': 'AI Disbursement',
+            'manual_disbursement': 'Manual Disbursement',
+            'login_as': 'Login As',
+            'authority_login': 'Authority Login',
+            'donor_dao_portal': 'Donor DAO Portal',
+            'logout': 'Logout',
+            
+            // Common components
+            'welcome': 'Welcome to Zakat DAO',
+            'about': 'About Us',
+            'voucher_details': 'Voucher Details',
+            'back_to_ledger': 'Back to Ledger',
+            'total_donated': 'Total Donated',
+            'total_disbursed': 'Total Disbursed',
+            'remaining_balance': 'Remaining Balance',
+            'donations': 'Donations',
+            'disbursements': 'Disbursements',
+            'date': 'Date',
+            'donor': 'Donor',
+            'amount': 'Amount',
+            'cause': 'Cause',
+            'recipient': 'Recipient',
+            'notes': 'Notes',
+            'download': 'Download',
+            
+            // Footer
+            'footer_text': '© 2023 Zakat DAO. This platform simulates blockchain/DAO behavior but does not use actual cryptocurrency.',
+            'footer_tagline': 'All donations are tracked in a transparent ledger system.'
+        },
+        'my': {
+            // Navigation
+            'zakat_dao': 'Zakat DAO',
+            'home': 'Laman Utama',
+            'public_ledger': 'Lejar Awam',
+            'donate': 'Derma',
+            'dao_governance': 'Tadbir Urus DAO',
+            'dashboard': 'Papan Pemuka',
+            'proposals': 'Cadangan',
+            'fund_allocations': 'Peruntukan Dana',
+            'propose_allocation': 'Cadangkan Peruntukan',
+            'admin': 'Pentadbir',
+            'recipients': 'Penerima',
+            'ai_disbursement': 'Agihan AI',
+            'manual_disbursement': 'Agihan Manual',
+            'login_as': 'Log Masuk Sebagai',
+            'authority_login': 'Log Masuk Pihak Berkuasa',
+            'donor_dao_portal': 'Portal Penderma DAO',
+            'logout': 'Log Keluar',
+            
+            // Common components
+            'welcome': 'Selamat Datang ke Zakat DAO',
+            'about': 'Tentang Kami',
+            'voucher_details': 'Butiran Baucar',
+            'back_to_ledger': 'Kembali ke Lejar',
+            'total_donated': 'Jumlah Derma',
+            'total_disbursed': 'Jumlah Diagihkan',
+            'remaining_balance': 'Baki Tinggal',
+            'donations': 'Derma',
+            'disbursements': 'Agihan',
+            'date': 'Tarikh',
+            'donor': 'Penderma',
+            'amount': 'Jumlah',
+            'cause': 'Sebab',
+            'recipient': 'Penerima',
+            'notes': 'Nota',
+            'download': 'Muat Turun',
+            
+            // Footer
+            'footer_text': '© 2023 Zakat DAO. Platform ini mensimulasikan tingkah laku blockchain/DAO tetapi tidak menggunakan cryptocurrency sebenar.',
+            'footer_tagline': 'Semua sumbangan dijejak dalam sistem lejar yang telus.'
+        }
+    };
+
+    function applyTranslation(lang) {
+        if (!translations[lang]) {
+            console.error(`Language '${lang}' not available`);
+            return;
+        }
+        
+        // Update all elements with data-translate attribute
+        document.querySelectorAll('[data-translate]').forEach(element => {
+            const key = element.getAttribute('data-translate');
+            if (translations[lang][key]) {
+                // Save original text if not already saved
+                if (!element.hasAttribute('data-original-text')) {
+                    element.setAttribute('data-original-text', element.textContent);
+                }
+                element.textContent = translations[lang][key];
+            }
+        });
+        
+        // Update page title if it matches any known translation
+        const pageTitle = document.title;
+        for (const [key, value] of Object.entries(translations['en'])) {
+            if (pageTitle.includes(value) && translations[lang][key]) {
+                document.title = document.title.replace(value, translations[lang][key]);
+                break;
+            }
+        }
+        
+        // Dispatch custom event for components to react to language change
+        document.dispatchEvent(new CustomEvent('languageChanged', { detail: { lang } }));
+    }
+
+    function changeLanguage(lang) {
+        // Store language preference
+        localStorage.setItem('preferredLanguage', lang);
+        
+        // Update language display
+        const langDisplay = document.getElementById('currentLang');
+        if (langDisplay) {
+            langDisplay.textContent = lang.toUpperCase();
+        }
+        
+        // Update active class
+        document.querySelectorAll('.language-selector .dropdown-item').forEach(item => {
+            item.classList.toggle('active', item.getAttribute('data-lang') === lang);
+        });
+        
+        // Apply translations
+        applyTranslation(lang);
+        
+        // Show toast notification
+        showLanguageToast(lang);
+    }
+    
+    function showLanguageToast(lang) {
+        // Remove existing toast if present
+        const existingToast = document.querySelector('.language-toast');
+        if (existingToast) {
+            existingToast.remove();
+        }
+        
+        // Create toast notification
+        const notification = document.createElement('div');
+        notification.className = 'language-toast';
+        notification.innerHTML = `
+            <div class="toast align-items-center text-white bg-success border-0 show" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        ${lang === 'en' ? 'Language changed to English' : 'Bahasa ditukar ke Bahasa Malaysia'}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close" onclick="this.parentNode.parentNode.parentNode.remove()"></button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(notification);
+        
+        // Remove after 3 seconds
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
+    }
+
+    // Initialize on DOM load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add click event listeners to language options
+        document.querySelectorAll('.language-option').forEach(option => {
+            option.addEventListener('click', function(e) {
+                e.preventDefault();
+                const lang = this.getAttribute('data-lang');
+                changeLanguage(lang);
+            });
+        });
+        
+        // Initialize from stored preference
+        const storedLang = localStorage.getItem('preferredLanguage') || 'en';
+        
+        // Update display
+        const langDisplay = document.getElementById('currentLang');
+        if (langDisplay) {
+            langDisplay.textContent = storedLang.toUpperCase();
+        }
+        
+        // Update active class
+        document.querySelectorAll('.language-option').forEach(item => {
+            item.classList.toggle('active', item.getAttribute('data-lang') === storedLang);
+        });
+        
+        // Apply translations
+        applyTranslation(storedLang);
+    });
+</script>
+
+<style>
+    .language-toast {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 9999;
+    }
+    
+    .language-selector .dropdown-item.active {
+        background-color: #f8f9fa;
+        color: #212529;
+        font-weight: bold;
+    }
+</style>
