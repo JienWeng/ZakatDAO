@@ -1,6 +1,11 @@
-# Zakat DAO Platform
+# ZakatDAO
 
-A blockchain-inspired platform for managing and distributing Zakat funds with transparency and efficiency.
+*Decentralized Zakat Distribution Platform by Jien Weng*
+
+Zakat DAO is a decentralized platform built to modernize and automate the distribution of zakat in a **transparent**, **Shariah-compliant**, and **community-driven** way. By integrating blockchain technology, decentralized governance (**DAO**), AI-based prioritization, and e-wallet disbursement, the platform ensures that zakat funds are allocated fairly, securely, and efficiently to those in need.
+
+## Demo
+[Try it on the live demo](https://zakatdao.onrender.com)  
 
 ## Project Overview
 
@@ -8,41 +13,48 @@ This platform implements a transparent Zakat management system with:
 - Blockchain-style immutable ledger
 - TNG eWallet integration for disbursements
 - AI-powered fund distribution
+- Smart contract and community-driven platform
 - QR code enabled vouchers
-- Real-time usage tracking
+
+## Objectives
+
+- **Transparency**: Every donation, vote, and disbursement is recorded immutably on the blockchain and viewable by the public.
+- **Shariah Compliance**: The platform is designed to uphold the principles of Islamic zakat, ensuring fair categorization and distribution to asnaf groups.
+- **Decentralized Governance**: Enables donors and stakeholders to participate in decision-making via blockchain-based voting mechanisms.
+- **Inclusivity and Accessibility**: Designed to serve not only urban areas but also extend disbursement accessibility to rural and underbanked communities through e-wallet integration and offline vouchers.
+- **Efficiency**: Automate disbursements using AI and smart contracts to eliminate the need for intermediaries and traditional organizational structures, lowering the costs. 
+
+---
 
 ## Features
 
-### 1. Blockchain-Style Ledger
-- Immutable transaction history
-- Cryptographic hash linking
-- Multi-signature validation
-- Real-time integrity verification
+### Donor Interface
+- Contribute via e-wallet or FPX.
+- View live blockchain ledger of all transactions.
+- Vote on fund allocation (e.g. education, healthcare).
+- Download vouchers showing donation usage.
 
-### 2. TNG eWallet Integration
-- Direct disbursement to recipient wallets
-- Grocery-specific vouchers
-- Real-time transaction tracking
-- Usage monitoring at partner merchants
+### AI-Driven Disbursement
+- AI scores recipients for fair prioritization.
+- Combines donor votes with AI for allocation.
+- Manual disbursements require DAO-style voting.
 
-### 3. AI-Powered Distribution
-- Need-based allocation
-- Priority scoring system
-- Multi-factor analysis
-- Automated disbursement recommendations
+### DAO Governance
+- Smart contracts enable transparent community voting.
+- Multi-signature for large fund releases.
+- All decisions are immutably recorded on-chain.
 
-### 4. Security Features
-- Hash-based integrity checks
-- Multi-signature validation
-- Role-based access control
-- Audit trail for all actions
+### Real-World Integration
+- Supports TNG, Boost, FPX etc.
+- Digital/print vouchers for offline recipients.
+- Track disbursements by donors and recipients.
 
 ## Setup Instructions
 
 1. Clone and setup environment:
 ```bash
-git clone https://github.com/yourusername/GiveNGo.git
-cd GiveNGo
+git clone https://github.com/jienweng/ZakatDAO
+cd ZakatDAO
 python -m venv venv
 source venv/bin/activate  # For Unix/macOS
 venv\Scripts\activate     # For Windows
@@ -52,12 +64,6 @@ venv\Scripts\activate     # For Windows
 ```bash
 chmod +x install_dependencies.sh
 ./install_dependencies.sh
-```
-
-3. Initialize data directory:
-```bash
-mkdir -p data static
-touch data/ledger.csv data/usage.csv
 ```
 
 ## Usage Guide
@@ -138,30 +144,6 @@ GET /api/verify-chain
 /dao/vote/<id> - Cast vote on proposal
 ```
 
-### Allocation Policies
-```
-Asnaf Distribution:
-- Fakir: 25% (groceries, medical, education)
-- Miskin: 25% (groceries, medical, education) 
-- Amil: 12.5% (operational)
-- Muallaf: 12.5% (education, religious)
-- Riqab: 6.25% (education, skills)
-- Gharimin: 6.25% (debt_relief)
-- Fisabilillah: 6.25% (religious, education)
-- Ibnu Sabil: 6.25% (travel, emergency)
-
-Usage Categories:
-- Groceries (Priority 1)
-- Medical (Priority 2)
-- Education (Priority 3)
-- Skills Training (Priority 4)
-- Religious Education (Priority 5)
-- Operational Costs (Priority 6)
-- Debt Relief (Priority 7)
-- Travel Assistance (Priority 8)
-- Emergency Aid (Priority 9)
-```
-
 ### DAO Governance
 - Proposal creation (admin)
 - Two types of proposals:
@@ -218,11 +200,6 @@ GET /api/verify-chain
     - Returns validation status and latest block
 ```
 
-### File Downloads
-```
-/download-voucher/<code> - Download voucher QR code image
-```
-
 ## URL Access Control
 
 ### Public Access
@@ -251,45 +228,24 @@ GET /api/verify-chain
   - 24-hour voting window
   - 60% approval threshold
 
-## Troubleshooting
 
-### Common Issues
+## Tech Stack
 
-1. Ledger Integrity:
-   - Run `/api/verify-chain`
-   - Check hash linkages
-   - Verify signatures
+| Layer               | Technology                                  |
+|--------------------|---------------------------------------------|
+| Frontend           | React.js, Tailwind CSS                      |
+| Backend            | Node.js / Flask (Python)                    |
+| Blockchain Layer   | Ethereum / Polygon    |
+| Smart Contracts    | Solidity                                     |
+| AI Models          | Python (scikit-learn, TensorFlow)            |
+| Off-chain Storage  | MongoDB, PostgreSQL, IPFS                    |
+| E-Wallet Support   | TNG, Boost, FPX      |
+| Deployment         | AWS/Docker backend|
 
-2. TNG Integration:
-   - Check `tng_transactions.json`
-   - Verify merchant IDs
-   - Monitor usage tracking
-
-3. AI Disbursement:
-   - Review priority scores
-   - Check recipient data
-   - Validate allocation logic
-
-## Security Considerations
-
-1. Production Deployment:
-   - Change default credentials
-   - Enable HTTPS
-   - Use secure session management
-   - Implement proper DAO governance
-
-2. Data Protection:
-   - Regular backups
-   - Encrypted storage
-   - Access logging
-   - Audit trails
-
-## License
-
-MIT License - See LICENSE file for details
+---
 
 ## Contact
 
 - Report issues on GitHub
 - Check TROUBLESHOOTING.md
-- Contact support team at support@example.com
+- Contact laijienweng@gmail.com
