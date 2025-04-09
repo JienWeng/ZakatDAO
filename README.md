@@ -2,6 +2,8 @@
 
 *Decentralized Zakat Distribution Platform by Jien Weng*
 
+## Note: For whitepaper, please refer to [this PDF](https://jienweng.netlify.app/assets/misc/report-ZakatDAO.pdf).
+
 Zakat DAO is a decentralized platform built to modernize and automate the distribution of zakat in a **transparent**, **Shariah-compliant**, and **community-driven** way. By integrating blockchain technology, decentralized governance (**DAO**), AI-based prioritization, and e-wallet disbursement, the platform ensures that zakat funds are allocated fairly, securely, and efficiently to those in need.
 
 ## Demo
