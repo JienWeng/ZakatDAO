@@ -2,7 +2,7 @@
 
 *Decentralized Zakat Distribution Platform by Jien Weng*
 
-![ZakatDAO Image](img/banner.png) *(replace with the actual image URL)*
+[![ZakatDAO Image](img/banner.png)](https://zakatdao.onrender.com)
 
 ## ZakatDAO Hub
 Welcome to the ZakatDAO hub! Here you can find important resources to better understand the platform:
