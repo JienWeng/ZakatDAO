@@ -49,7 +49,7 @@
                             <option value="" disabled selected>Select a Zakat type...</option>
                             {% for zakat_type in zakat_types %}
                             <option value="{{ zakat_type.id }}">
-                                {{ zakat_type.name }} ({{ zakat_type.tax_rebate }}% rebate)
+                                {{ zakat_type.name }}
                             </option>
                             {% endfor %}
                         </select>

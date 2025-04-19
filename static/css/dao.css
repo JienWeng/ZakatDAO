@@ -91,19 +91,3 @@
     width: 100%;
     margin-bottom: 1rem;
 }
-
-/* Token Management Styles */
-.token-card {
-    transition: all 0.3s ease;
-}
-
-.token-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-.token-balance {
-    background: -webkit-linear-gradient(45deg, #2196F3, #00BCD4);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
