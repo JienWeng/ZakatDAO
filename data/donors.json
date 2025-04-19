@@ -10,5 +10,11 @@
     "vouchers": [],
     "created_at": "2025-04-19T13:50:07.409909",
     "donor_id": "DONOR-01c7d804"
+  },
+  "aman@gmail.com": {
+    "password_hash": "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9",
+    "vouchers": [],
+    "created_at": "2025-04-19T20:05:28.564465",
+    "donor_id": "DONOR-c6344569"
   }
 }
