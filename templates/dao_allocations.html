@@ -1,72 +1,93 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Allocation Policies - Zakat DAO</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-    {% include 'nav.html' %}
+{% extends "base.html" %}
 
-    <div class="container py-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1>Zakat Allocation Policies</h1>
+{% block title %}Allocation Policies - Zakat DAO{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/dao.css">
+<style>
+    .allocation-progress {
+        height: 25px;
+        border-radius: 8px;
+        background: rgba(33, 150, 243, 0.1);
+    }
+    .allocation-progress .progress-bar {
+        background: #2196F3;
+        border-radius: 8px;
+    }
+    .category-card {
+        transition: all 0.2s;
+    }
+    .category-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="mb-2">Zakat Allocation Policies</h1>
+            <p class="lead text-muted mb-0">Current distribution rules and categories</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('list_proposals') }}" class="btn btn-outline-primary">
+                <i class="bi bi-list-check me-2"></i>View Proposals
+            </a>
             {% if is_admin %}
             <a href="{{ url_for('propose_allocation') }}" class="btn btn-primary">
-                Propose Changes
+                <i class="bi bi-plus-circle me-2"></i>Propose Changes
             </a>
             {% endif %}
         </div>
+    </div>
 
-        <div class="row">
-            <!-- Asnaf Allocations -->
-            <div class="col-md-6 mb-4">
-                <div class="card h-100">
-                    <div class="card-header">
-                        <h5 class="mb-0">Asnaf Distribution</h5>
-                    </div>
-                    <div class="card-body">
-                        {% for asnaf, data in allocations.asnaf.items() %}
-                        <div class="mb-3">
-                            <h6>{{ asnaf|title }}</h6>
-                            <div class="progress mb-2" style="height: 25px;">
-                                <div class="progress-bar" role="progressbar" 
-                                     style="width: {{ data.percentage }}%">
-                                    {{ data.percentage }}%
-                                </div>
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card category-card h-100">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0">Asnaf Distribution</h5>
+                </div>
+                <div class="card-body">
+                    {% for asnaf, data in allocations.asnaf.items() %}
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <h6 class="mb-0">{{ asnaf|title }}</h6>
+                            <span class="text-primary">{{ data.percentage }}%</span>
+                        </div>
+                        <div class="allocation-progress mb-2">
+                            <div class="progress-bar" role="progressbar" 
+                                 style="width: {{ data.percentage }}%">
                             </div>
-                            <small class="text-muted">
-                                Allowed categories: {{ data.categories|join(', ') }}
-                            </small>
+                        </div>
+                        <small class="text-muted d-block">
+                            Categories: {{ data.categories|join(', ') }}
+                        </small>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card category-card h-100">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0">Usage Categories</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for category, data in allocations.usage_categories.items() %}
+                        <div class="list-group-item">
+                            <h6>{{ category|title }}</h6>
+                            <p class="mb-1">{{ data.description }}</p>
+                            <small class="text-muted">Priority: {{ data.priority }}</small>
                         </div>
                         {% endfor %}
                     </div>
                 </div>
             </div>
-
-            <!-- Usage Categories -->
-            <div class="col-md-6 mb-4">
-                <div class="card h-100">
-                    <div class="card-header">
-                        <h5 class="mb-0">Usage Categories</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="list-group">
-                            {% for category, data in allocations.usage_categories.items() %}
-                            <div class="list-group-item">
-                                <h6>{{ category|title }}</h6>
-                                <p class="mb-1">{{ data.description }}</p>
-                                <small class="text-muted">Priority: {{ data.priority }}</small>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+</div>
+{% endblock %}

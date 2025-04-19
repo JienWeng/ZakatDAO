@@ -1,19 +1,21 @@
 {
   "asnaf": {
     "fakir": {
-      "percentage": 25,
+      "percentage": 30.0,
       "categories": [
         "groceries",
         "medical",
-        "education"
+        "education",
+        "religious"
       ]
     },
     "miskin": {
-      "percentage": 25,
+      "percentage": 20.0,
       "categories": [
         "groceries",
         "medical",
-        "education"
+        "education",
+        "operational"
       ]
     },
     "amil": {
@@ -30,27 +32,27 @@
       ]
     },
     "riqab": {
-      "percentage": 6.25,
+      "percentage": 6.5,
       "categories": [
         "education",
         "skills"
       ]
     },
     "gharimin": {
-      "percentage": 6.25,
+      "percentage": 6.0,
       "categories": [
         "debt_relief"
       ]
     },
     "fisabilillah": {
-      "percentage": 6.25,
+      "percentage": 6.5,
       "categories": [
-        "religious",
-        "education"
+        "education",
+        "religious"
       ]
     },
     "ibnu_sabil": {
-      "percentage": 6.25,
+      "percentage": 6.0,
       "categories": [
         "travel",
         "emergency"

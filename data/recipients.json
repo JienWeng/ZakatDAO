@@ -7,9 +7,9 @@
     "family_size": 4,
     "monthly_income": 1200,
     "priority_base": 8.5,
-    "last_disbursement": "2025-04-09T12:55:59.081754",
-    "total_received": 5914.5,
-    "disbursement_count": 9
+    "last_disbursement": "2025-04-19T13:07:41.398885",
+    "total_received": 7068.0,
+    "disbursement_count": 10
   },
   {
     "id": "RCP002",
@@ -19,9 +19,9 @@
     "family_size": 3,
     "monthly_income": 1500,
     "priority_base": 6.5,
-    "last_disbursement": "2025-04-09T11:49:08.341687",
-    "total_received": 3948.0,
-    "disbursement_count": 5
+    "last_disbursement": "2025-04-19T13:07:41.403880",
+    "total_received": 4755.0,
+    "disbursement_count": 6
   },
   {
     "id": "RCP003",
@@ -67,9 +67,9 @@
     "family_size": 4,
     "monthly_income": 2500,
     "priority_base": 0.5,
-    "last_disbursement": null,
-    "total_received": 0.0,
-    "disbursement_count": 0
+    "last_disbursement": "2025-04-19T13:07:41.406357",
+    "total_received": 630.0,
+    "disbursement_count": 1
   },
   {
     "id": "RCP007",
@@ -91,9 +91,9 @@
     "family_size": 4,
     "monthly_income": 1300,
     "priority_base": 8.5,
-    "last_disbursement": "2025-04-09T12:55:59.076280",
-    "total_received": 1500.0,
-    "disbursement_count": 1
+    "last_disbursement": "2025-04-19T13:07:41.401199",
+    "total_received": 2653.5,
+    "disbursement_count": 2
   },
   {
     "id": "RCP009",
@@ -103,9 +103,9 @@
     "family_size": 3,
     "monthly_income": 1600,
     "priority_base": 6.5,
-    "last_disbursement": "2025-04-09T12:55:59.078661",
-    "total_received": 1500.0,
-    "disbursement_count": 1
+    "last_disbursement": "2025-04-19T13:07:41.405083",
+    "total_received": 2307.0,
+    "disbursement_count": 2
   },
   {
     "id": "RCP010",
@@ -127,9 +127,9 @@
     "family_size": 5,
     "monthly_income": 2100,
     "priority_base": 2.5,
-    "last_disbursement": null,
-    "total_received": 0.0,
-    "disbursement_count": 0
+    "last_disbursement": "2025-04-19T13:07:41.402413",
+    "total_received": 1125.0,
+    "disbursement_count": 1
   },
   {
     "id": "RCP012",
@@ -151,8 +151,8 @@
     "family_size": 4,
     "monthly_income": 2600,
     "priority_base": 0.5,
-    "last_disbursement": null,
-    "total_received": 0.0,
-    "disbursement_count": 0
+    "last_disbursement": "2025-04-19T13:07:41.414809",
+    "total_received": 64.0,
+    "disbursement_count": 2
   }
 ]

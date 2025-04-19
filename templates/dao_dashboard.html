@@ -1,47 +1,66 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DAO Governance - Zakat DAO</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-    {% include 'nav.html' %}
+{% extends "base.html" %}
 
-    <div class="container py-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1>DAO Governance Dashboard</h1>
-            <div>
-                {% if not is_donor and not is_admin %}
-                    <a href="{{ url_for('donor_login') }}" class="btn btn-outline-primary">Donor Login</a>
-                {% endif %}
-            </div>
+{% block title %}DAO Governance - Zakat DAO{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/dao.css">
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="mb-2">DAO Governance</h1>
+            <p class="lead text-muted mb-0">Decentralized decision making for Zakat distribution</p>
         </div>
-
-        <div class="alert alert-info">
-            <h4 class="alert-heading">About DAO Governance</h4>
-            <p>Zakat DAO uses a hybrid governance model where:</p>
-            <ul>
-                <li>Authority votes have 50% weight</li>
-                <li>Donor votes have 50% collective weight</li>
-                <li>Minimum 3 votes required for decisions</li>
-                <li>24-hour voting window</li>
-                <li>60% approval threshold required</li>
-            </ul>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('list_proposals') }}" class="btn btn-outline-primary">
+                <i class="bi bi-list-check me-2"></i>All Proposals
+            </a>
+            <a href="{{ url_for('dao_tokens') }}" class="btn btn-outline-primary">
+                <i class="bi bi-coin me-2"></i>Governance Tokens
+            </a>
+            {% if not is_donor and not is_admin %}
+            <a href="{{ url_for('donor_login') }}" class="btn btn-primary">
+                <i class="bi bi-person me-2"></i>Donor Login
+            </a>
+            {% endif %}
         </div>
+    </div>
 
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5 class="mb-0">Active Proposals</h5>
+    <div class="governance-card p-4 mb-4">
+        <h4 class="mb-3">About DAO Governance</h4>
+        <p>Zakat DAO uses a hybrid governance model where:</p>
+        <ul>
+            <li>Authority votes have 50% weight</li>
+            <li>Donor votes have 50% collective weight</li>
+            <li>Minimum 3 votes required for decisions</li>
+            <li>24-hour voting window</li>
+            <li>60% approval threshold required</li>
+        </ul>
+    </div>
+
+    <div class="card proposal-card mb-4">
+        <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Active Proposals</h5>
+            {% if is_admin %}
+            <div class="btn-group">
+                <a href="{{ url_for('disburse_funds') }}" class="btn btn-sm btn-primary">
+                    <i class="bi bi-plus-circle me-1"></i>New Disbursement
+                </a>
+                <a href="{{ url_for('propose_allocation') }}" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-gear me-1"></i>New Allocation
+                </a>
             </div>
-            <div class="card-body">
-                {% if proposals %}
-                    <div class="list-group">
-                        {% for id, proposal in proposals.items() %}
-                            <a href="{{ url_for('view_proposal', proposal_id=id) }}" 
-                               class="list-group-item list-group-item-action">
-                                <div class="d-flex w-100 justify-content-between">
+            {% endif %}
+        </div>
+        <div class="card-body p-0">
+            {% if proposals %}
+                <div class="list-group list-group-flush">
+                    {% for id, proposal in proposals.items() %}
+                        <div class="list-group-item list-group-item-action p-4">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
                                     <h5 class="mb-1">
                                         {% if proposal.type == 'allocation' %}
                                             {{ proposal.allocation_type|title }} Allocation Proposal
@@ -49,48 +68,34 @@
                                             Disbursement to {{ proposal.disbursement_data.user }}
                                         {% endif %}
                                     </h5>
-                                    <small>
-                                        Expires: {{ proposal.expires_at }}
-                                    </small>
+                                    <p class="mb-1 text-muted">
+                                        {% if proposal.type == 'allocation' %}
+                                            Policy change proposal for {{ proposal.allocation_type }} distributions
+                                        {% else %}
+                                            Amount: {{ format_amount(proposal.disbursement_data.amount) }}
+                                        {% endif %}
+                                    </p>
+                                    <small>Created by: {{ proposal.created_by }} • Expires: {{ proposal.expires_at }}</small>
                                 </div>
-                                <p class="mb-1">
-                                    {% if proposal.type == 'allocation' %}
-                                        Policy change proposal for {{ proposal.allocation_type }} distributions
-                                    {% else %}
-                                        Amount: {{ format_amount(proposal.disbursement_data.amount) }}
-                                    {% endif %}
-                                </p>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <small>
-                                        Created by: {{ proposal.created_by }}
-                                    </small>
-                                    <span class="badge bg-primary">
+                                <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                                    <span class="badge bg-primary mb-2 d-block d-md-inline-block">
                                         {{ proposal.votes.authorities|length + proposal.votes.donors|length }} votes
                                     </span>
+                                    <a href="{{ url_for('view_proposal', proposal_id=id) }}" 
+                                       class="btn btn-sm btn-outline-primary ms-md-2">
+                                        <i class="bi bi-arrow-right me-1"></i>Review & Vote
+                                    </a>
                                 </div>
-                            </a>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    <p class="text-muted mb-0">No active proposals at this time.</p>
-                {% endif %}
-            </div>
-        </div>
-
-        {% if is_admin %}
-            <div class="text-end">
-                <div class="btn-group">
-                    <a href="{{ url_for('disburse_funds') }}" class="btn btn-primary">
-                        Create Disbursement Proposal
-                    </a>
-                    <a href="{{ url_for('propose_allocation') }}" class="btn btn-outline-primary">
-                        Create Allocation Proposal
-                    </a>
+                            </div>
+                        </div>
+                    {% endfor %}
                 </div>
-            </div>
-        {% endif %}
+            {% else %}
+                <div class="text-center p-4">
+                    <p class="text-muted mb-0">No active proposals at this time.</p>
+                </div>
+            {% endif %}
+        </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+</div>
+{% endblock %}

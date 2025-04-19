@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Donor Login - Zakat DAO{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/dao.css">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="text-center mb-4">
+                <h1 class="h3">Donor Login</h1>
+                <p class="text-muted">Access DAO governance features</p>
+            </div>
+            
+            <div class="card">
+                <div class="card-body p-4">
+                    {% if error %}
+                    <div class="alert alert-danger">{{ error }}</div>
+                    {% endif %}
+                    
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Password</label>
+                            <input type="password" class="form-control" name="password" required>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Login</button>
+                            <a href="{{ url_for('donor_register') }}" class="btn btn-link">New donor? Register here</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

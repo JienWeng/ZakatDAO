@@ -1,181 +1,121 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zakat DAO - Blockchain-Based Zakat Management</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .hero {
-            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('/static/mosque.png');
-            background-size: cover;
-            background-position: center;
-            color: white;
-            padding: 100px 0;
-        }
-        .feature-card {
-            transition: transform 0.3s;
-        }
-        .feature-card:hover {
-            transform: translateY(-5px);
-        }
-    </style>
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container">
-            <a class="navbar-brand" href="/">Zakat DAO</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/donate">Donate</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/ledger">Public Ledger</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+{% extends "base.html" %}
 
-    <div class="hero text-center">
-        <div class="container">
-            <h1 class="display-4 mb-4">Transparent Zakat Management</h1>
-            <p class="lead mb-4">A blockchain-inspired platform for managing and distributing Zakat funds with complete transparency and efficiency.</p>
-            <a href="/donate" class="btn btn-primary btn-lg">Make a Contribution</a>
+{% block title %}Zakat DAO - Blockchain-Based Zakat Management{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/home.css">
+{% endblock %}
+
+{% block content %}
+<section class="hero text-center text-white">
+    <div class="container">
+        <h1 class="display-4 fw-bold mb-4">Transparent Zakat Management</h1>
+        <p class="lead mb-4 fw-light" style="font-size: 1.3rem">
+            A blockchain-inspired platform for managing and distributing Zakat funds with complete transparency and efficiency
+        </p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="/donate" class="btn btn-light btn-lg px-4">Make a Contribution</a>
+            <a href="/ledger" class="btn btn-outline-light btn-lg px-4">View Ledger</a>
         </div>
     </div>
+</section>
 
-    <div class="container py-5">
-        <div class="row mb-5">
-            <div class="col-md-4 mb-4">
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4 mb-5">
+            <div class="col-md-4">
                 <div class="card feature-card h-100">
-                    <div class="card-body">
-                        <h3>🔒 Secure</h3>
-                        <p>Every transaction is recorded in an immutable blockchain-style ledger, ensuring complete transparency and security.</p>
+                    <div class="card-body text-center p-4">
+                        <div class="icon-circle">
+                            <i class="bi bi-shield-lock"></i>
+                        </div>
+                        <h3 class="h4 mb-3">Secure</h3>
+                        <p class="text-muted mb-0">Every transaction is recorded in an immutable blockchain-style ledger, ensuring complete transparency and security.</p>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4 mb-4">
+            <div class="col-md-4">
                 <div class="card feature-card h-100">
-                    <div class="card-body">
-                        <h3>🤖 AI-Powered</h3>
-                        <p>Our AI system helps distribute funds efficiently to those who need it most, based on multiple factors.</p>
+                    <div class="card-body text-center p-4">
+                        <div class="icon-circle">
+                            <i class="bi bi-robot"></i>
+                        </div>
+                        <h3 class="h4 mb-3">AI-Powered</h3>
+                        <p class="text-muted mb-0">Our AI system helps distribute funds efficiently to those who need it most, based on multiple factors.</p>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4 mb-4">
+            <div class="col-md-4">
                 <div class="card feature-card h-100">
-                    <div class="card-body">
-                        <h3>📱 Traceable</h3>
-                        <p>Track your contributions and see how they're being used with our transparent voucher system.</p>
+                    <div class="card-body text-center p-4">
+                        <div class="icon-circle">
+                            <i class="bi bi-geo-alt"></i>
+                        </div>
+                        <h3 class="h4 mb-3">Traceable</h3>
+                        <p class="text-muted mb-0">Track your contributions and see how they're being used with our transparent voucher system.</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="row align-items-center py-5">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header bg-primary text-white">
-                        <h3 class="mb-0">Quick Contribution</h3>
-                    </div>
-                    <div class="card-body">
-                        <form action="/donate" method="GET">
-                            <p>Ready to make your Zakat contribution? Click below to get started:</p>
-                            <button type="submit" class="btn btn-success btn-lg w-100">Start Contributing</button>
-                        </form>
-                    </div>
+        <div class="quick-donate p-4 p-md-5 mb-5">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h2 class="mb-3">Ready to Contribute?</h2>
+                    <p class="lead text-muted mb-4">Your Zakat can make a real difference in someone's life. All contributions are tracked transparently.</p>
+                </div>
+                <div class="col-md-4 text-center text-md-end">
+                    <a href="/donate" class="btn btn-primary btn-lg px-4">
+                        Start Contributing
+                        <i class="bi bi-arrow-right ms-2"></i>
+                    </a>
                 </div>
             </div>
         </div>
 
-        <!-- Role Selection Section -->
-        <div class="row mt-5 mb-4">
-            <div class="col-12 text-center">
-                <h2>Choose Your Role</h2>
-                <p class="lead">Are you a donor, authority member, or want to make a donation?</p>
-            </div>
+        <div class="text-center mb-4">
+            <h2>Choose Your Role</h2>
+            <p class="lead text-muted">Access the platform based on your role</p>
         </div>
-        
-        <div class="row justify-content-center g-4">
-            <!-- Donor Card -->
+
+        <div class="row g-4 justify-content-center">
             <div class="col-md-4">
-                <div class="card h-100">
-                    <div class="card-body text-center">
-                        <i class="bi bi-person-heart display-4 text-primary mb-3"></i>
-                        <h3>Donor</h3>
-                        <p>Track your donations and participate in DAO voting</p>
-                        <a href="/dao" class="btn btn-primary">Donor Dao Portal</a>
+                <div class="card feature-card h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="icon-circle">
+                            <i class="bi bi-person-heart"></i>
+                        </div>
+                        <h3 class="h4 mb-3">Donor</h3>
+                        <p class="text-muted mb-4">Track your donations and participate in DAO voting</p>
+                        <a href="/dao" class="btn btn-outline-primary">Access Donor Portal</a>
                     </div>
                 </div>
             </div>
-            
-            <!-- Authority Card -->
             <div class="col-md-4">
-                <div class="card h-100">
-                    <div class="card-body text-center">
-                        <i class="bi bi-shield-lock display-4 text-success mb-3"></i>
-                        <h3>Authority</h3>
-                        <p>Manage disbursements and governance decisions</p>
-                        <a href="/admin/login" class="btn btn-success">Authority Login</a>
+                <div class="card feature-card h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="icon-circle">
+                            <i class="bi bi-shield-lock"></i>
+                        </div>
+                        <h3 class="h4 mb-3">Authority</h3>
+                        <p class="text-muted mb-4">Manage disbursements and governance decisions</p>
+                        <a href="/admin/login" class="btn btn-outline-success">Authority Login</a>
                     </div>
                 </div>
             </div>
-            
-            <!-- New Donation Card -->
             <div class="col-md-4">
-                <div class="card h-100">
-                    <div class="card-body text-center">
-                        <i class="bi bi-gift display-4 text-info mb-3"></i>
-                        <h3>Make a Donation</h3>
-                        <p>Contribute Zakat to help those in need</p>
-                        <a href="/donate" class="btn btn-info text-white">Donate Now</a>
+                <div class="card feature-card h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="icon-circle">
+                            <i class="bi bi-gift"></i>
+                        </div>
+                        <h3 class="h4 mb-3">Make a Donation</h3>
+                        <p class="text-muted mb-4">Contribute Zakat to help those in need</p>
+                        <a href="/donate" class="btn btn-outline-info">Donate Now</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <div class="bg-light py-5">
-        <div class="container">
-            <h2 class="text-center mb-4">How It Works</h2>
-            <div class="row">
-                <div class="col-md-4 mb-4">
-                    <div class="text-center">
-                        <h4>1. Make a Contribution</h4>
-                        <p>Choose your Zakat type and make your contribution securely through our platform.</p>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <div class="text-center">
-                        <h4>2. Get a Voucher</h4>
-                        <p>Receive a unique voucher ID to track your contribution in our blockchain-style ledger.</p>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <div class="text-center">
-                        <h4>3. Track Impact</h4>
-                        <p>Monitor how your contribution is being used to help those in need.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <footer class="bg-dark text-light py-4">
-        <div class="container text-center">
-            <p>© 2023 Zakat DAO. This platform simulates blockchain/DAO behavior but does not use actual cryptocurrency.</p>
-            <p><small>All donations are tracked in a transparent ledger system.</small></p>
-        </div>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+</section>
+{% endblock %}

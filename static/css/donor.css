@@ -1,0 +1,41 @@
+.donor-stats {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+}
+
+.vote-progress {
+    height: 25px;
+    border-radius: 12px;
+    background-color: rgba(0,0,0,0.05);
+}
+
+.proposal-card {
+    transition: all 0.2s;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+}
+
+.proposal-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.donation-history {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.stat-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+    background: rgba(33, 150, 243, 0.1);
+    color: #2196F3;
+}

@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}Donor Dashboard - Zakat DAO{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/donor.css">
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="mb-2">Donor Dashboard</h1>
+            <p class="lead text-muted mb-0">Welcome back, {{ session.donor_id }}</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="/donate" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i>New Donation
+            </a>
+            <a href="/dao/proposals" class="btn btn-outline-primary">
+                <i class="bi bi-list-check me-2"></i>View Proposals
+            </a>
+        </div>
+    </div>
+
+    <!-- Donation Stats -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="stat-circle mb-3">
+                        <i class="bi bi-cash"></i>
+                    </div>
+                    <h3 class="mb-1">{{ format_amount(total_donated) }}</h3>
+                    <p class="text-muted mb-0">Total Donations</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="stat-circle mb-3">
+                        <i class="bi bi-activity"></i>
+                    </div>
+                    <h3 class="mb-1">{{ active_proposals }}</h3>
+                    <p class="text-muted mb-0">Active Proposals</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="stat-circle mb-3">
+                        <i class="bi bi-check2-circle"></i>
+                    </div>
+                    <h3 class="mb-1">{{ votes_cast }}</h3>
+                    <p class="text-muted mb-0">Votes Cast</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Proposals -->
+    <div class="card border-0 shadow-sm mb-5">
+        <div class="card-header bg-transparent border-0">
+            <h5 class="mb-0">Active Proposals</h5>
+        </div>
+        <div class="card-body p-0">
+            {% if active_proposals %}
+            <div class="list-group list-group-flush">
+                {% for proposal in active_proposals %}
+                <div class="list-group-item p-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">{{ proposal.title }}</h6>
+                            <p class="text-muted small mb-0">Created by {{ proposal.created_by }}</p>
+                        </div>
+                        <a href="{{ url_for('view_proposal', proposal_id=proposal.id) }}" 
+                           class="btn btn-sm btn-outline-primary">Vote Now</a>
+                    </div>
+                    <div class="progress mt-2" style="height: 8px;">
+                        <div class="progress-bar" role="progressbar" 
+                             style="width: {{ proposal.approval_percentage }}%"></div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center p-4">
+                <p class="text-muted mb-0">No active proposals at this time</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Donation History -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Donation History</h5>
+            <a href="/ledger" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-box-arrow-up-right me-1"></i>View in Ledger
+            </a>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Zakat Type</th>
+                            <th>Voucher</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for donation in donations %}
+                        <tr>
+                            <td>{{ donation.timestamp }}</td>
+                            <td>{{ format_amount(donation.amount) }}</td>
+                            <td>{{ donation.zakat_type }}</td>
+                            <td><code class="small">{{ donation.voucher_code }}</code></td>
+                            <td>
+                                <span class="badge bg-{{ 'success' if donation.status == 'completed' else 'warning' }}">
+                                    {{ donation.status|title }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="/voucher/{{ donation.voucher_code }}" 
+                                   class="btn btn-sm btn-outline-primary">Details</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

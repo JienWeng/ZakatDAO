@@ -3,7 +3,7 @@ import os
 import uuid
 import hashlib
 from datetime import datetime
-from flask import Flask, render_template, request, redirect, url_for, session, send_file, jsonify
+from flask import Flask, render_template, request, redirect, url_for, session, send_file, jsonify, flash
 import io
 import base64
 import json
@@ -14,6 +14,7 @@ from config import ZAKAT_TYPES, ZAKAT_TYPES_BY_ID
 from ledger_utils import write_to_ledger
 from dao_voting import DaoVoting
 from PIL import Image, ImageDraw, ImageFont
+from utils.rewards import award_tokens, get_reward_amount
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Change this to a random secret key
@@ -50,6 +51,20 @@ app.config['ZAKAT_TYPES_BY_ID'] = ZAKAT_TYPES_BY_ID
 ADMIN_USERNAME = "admin"
 ADMIN_PASSWORD = "admin123"  # For demo only, use better auth in production
 
+# Simple donor storage (for demo purposes)
+DONORS_FILE = 'data/donors.json'
+
+def load_donors():
+    try:
+        with open(DONORS_FILE, 'r') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return {}
+
+def save_donors(donors):
+    with open(DONORS_FILE, 'w') as f:
+        json.dump(donors, f, indent=2)
+
 # Admin auth decorator
 def admin_required(f):
     @wraps(f)
@@ -59,10 +74,21 @@ def admin_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+# Login required decorator
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get('admin_logged_in') and not session.get('donor_logged_in'):
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
 @app.route('/')
 def home():
-    """Display the landing page with info and donate button."""
-    return render_template('index.html')
+    """Display the landing page"""
+    return render_template('index.html',
+                         is_admin=session.get('admin_logged_in', False),
+                         is_donor=session.get('donor_logged_in', False))
 
 @app.route('/donate', methods=['GET'])
 def donate_form():
@@ -112,6 +138,20 @@ def process_donation():
     
     # Store in session for confirmation page
     session['donation'] = donation_data
+    
+    # Award tokens if donor is logged in
+    if session.get('donor_logged_in'):
+        donor_id = session.get('donor_id')
+        
+        # Check if first donation
+        donors = load_donors()
+        donor = donors.get(session.get('donor_email', ''))
+        is_first_donation = not donor.get('vouchers')
+        
+        # Award tokens
+        if is_first_donation:
+            award_tokens(donor_id, get_reward_amount('first_donation'), 'First donation bonus')
+        award_tokens(donor_id, get_reward_amount('donation', amount), f'Donation of {format_amount(amount)}')
     
     return redirect(url_for('confirmation'))
 
@@ -552,6 +592,83 @@ def admin_logout():
     session.pop('admin_logged_in', None)
     return redirect(url_for('home'))
 
+@app.route('/donor/register', methods=['GET', 'POST'])
+def donor_register():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        voucher_code = request.form.get('voucher_code')
+        
+        donors = load_donors()
+        if email in donors:
+            flash('Email already registered', 'error')
+            return redirect(url_for('donor_register'))
+        
+        # Simple hash for demo purposes
+        password_hash = hashlib.sha256(password.encode()).hexdigest()
+        
+        # Create donor account
+        donors[email] = {
+            'password_hash': password_hash,
+            'vouchers': [voucher_code] if voucher_code else [],
+            'created_at': datetime.now().isoformat(),
+            'donor_id': f"DONOR-{uuid.uuid4().hex[:8]}"
+        }
+        
+        save_donors(donors)
+        flash('Registration successful! Please login.', 'success')
+        return redirect(url_for('donor_login'))
+        
+    return render_template('donor_register.html')
+
+@app.route('/donor/login', methods=['GET', 'POST'])
+def donor_login():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        
+        donors = load_donors()
+        donor = donors.get(email)
+        
+        if donor and donor['password_hash'] == hashlib.sha256(password.encode()).hexdigest():
+            session['donor_logged_in'] = True
+            session['donor_id'] = donor['donor_id']
+            session['donor_email'] = email
+            return redirect(url_for('dao_dashboard'))
+        
+        flash('Invalid credentials', 'error')
+    
+    return render_template('donor_login.html')
+
+@app.route('/donor/logout')
+def donor_logout():
+    session.pop('donor_logged_in', None)
+    session.pop('donor_id', None)
+    session.pop('donor_email', None)
+    return redirect(url_for('home'))
+
+@app.route('/donor/add-voucher', methods=['POST'])
+def add_donor_voucher():
+    if not session.get('donor_logged_in'):
+        return jsonify({'error': 'Not logged in'}), 401
+        
+    voucher_code = request.form.get('voucher_code')
+    if not voucher_code:
+        return jsonify({'error': 'No voucher code provided'}), 400
+        
+    donors = load_donors()
+    donor_email = session.get('donor_email')
+    
+    if donor_email in donors:
+        if voucher_code not in donors[donor_email]['vouchers']:
+            donors[donor_email]['vouchers'].append(voucher_code)
+            save_donors(donors)
+            flash('Voucher added successfully', 'success')
+        else:
+            flash('Voucher already added', 'info')
+            
+    return redirect(url_for('dao_dashboard'))
+
 @app.route('/disburse', methods=['GET', 'POST'])
 @admin_required
 def disburse_funds():
@@ -666,19 +783,6 @@ def dao_vote(proposal_id):
     
     return render_template('dao_vote.html', proposal=proposal)
 
-@app.route('/donor/login', methods=['GET', 'POST'])
-def donor_login():
-    """Donor login page."""
-    if request.method == 'POST':
-        # Simplified donor auth for demo
-        voucher_code = request.form.get('voucher_code')
-        if voucher_code:
-            session['donor_logged_in'] = True
-            session['donor_id'] = f"DONOR-{voucher_code[:8]}"
-            return redirect(url_for('dao_dashboard'))
-        
-    return render_template('donor_login.html')
-
 @app.route('/proposal/<proposal_id>')
 def view_proposal(proposal_id):
     """View disbursement proposal details and voting."""
@@ -713,6 +817,15 @@ def vote_on_proposal(proposal_id):
             vote=vote,
             voter_type=voter_type
         )
+        
+        # Award tokens for voting
+        if voter_type == 'donor':
+            award_tokens(voter_id, get_reward_amount('vote'), f'Voted on proposal #{proposal_id[:8]}')
+            
+            # Extra tokens if proposal is approved
+            if status == 'approved':
+                award_tokens(voter_id, get_reward_amount('proposal_approved'), 
+                           f'Proposal #{proposal_id[:8]} approved')
         
         if status == 'approved':
             # Execute the disbursement
@@ -1353,6 +1466,81 @@ def inject_utility_functions():
         'zakat_types': app.config['ZAKAT_TYPES'],
         'zakat_types_by_id': app.config['ZAKAT_TYPES_BY_ID']
     }
+
+# Token data storage - for demo purposes using simple JSON
+TOKEN_DATA_FILE = 'data/tokens.json'
+
+def load_token_data():
+    try:
+        with open(TOKEN_DATA_FILE, 'r') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return {
+            'total_supply': 0,
+            'balances': {},
+            'transactions': []
+        }
+
+def save_token_data(data):
+    with open(TOKEN_DATA_FILE, 'w') as f:
+        json.dump(data, f, indent=2)
+
+@app.route('/dao/tokens')
+@login_required
+def dao_tokens():
+    token_data = load_token_data()
+    
+    # Calculate basic stats
+    holder_count = len(token_data['balances'])
+    user_balance = token_data['balances'].get(session.get('donor_id', ''), 0)
+    total_supply = token_data['total_supply']
+    
+    # Calculate voting power percentage
+    voting_power = (user_balance / total_supply * 100) if total_supply > 0 else 0
+    
+    # Get top holders for distribution chart
+    holders = sorted(token_data['balances'].items(), key=lambda x: x[1], reverse=True)[:8]
+    holder_labels = [h[0] for h in holders]
+    holder_amounts = [h[1] for h in holders]
+    
+    return render_template('dao_token_dashboard.html',
+                         total_supply=total_supply,
+                         holder_count=holder_count,
+                         user_balance=user_balance,
+                         voting_power=voting_power,
+                         holder_labels=holder_labels,
+                         holder_amounts=holder_amounts)
+
+@app.route('/dao/tokens/mint', methods=['POST'])
+@admin_required
+def mint_tokens():
+    recipient = request.form.get('recipient')
+    amount = int(request.form.get('amount'))
+    reason = request.form.get('reason')
+    
+    if not recipient or amount <= 0:
+        flash('Invalid mint parameters', 'error')
+        return redirect(url_for('dao_tokens'))
+    
+    token_data = load_token_data()
+    
+    # Update recipient balance
+    token_data['balances'][recipient] = token_data['balances'].get(recipient, 0) + amount
+    token_data['total_supply'] += amount
+    
+    # Record transaction
+    token_data['transactions'].append({
+        'type': 'mint',
+        'recipient': recipient,
+        'amount': amount,
+        'reason': reason,
+        'timestamp': datetime.now().isoformat(),
+        'by': session.get('admin_username', 'admin')
+    })
+    
+    save_token_data(token_data)
+    flash(f'Successfully minted {amount} ZGT to {recipient}', 'success')
+    return redirect(url_for('dao_tokens'))
 
 if __name__ == '__main__':
     app.run(debug=True)

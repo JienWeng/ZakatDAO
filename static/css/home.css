@@ -1,0 +1,40 @@
+.hero {
+    background: linear-gradient(rgba(33, 150, 243, 0.7), rgba(33, 150, 243, 0.5)), url('/static/mosque.png');
+    background-size: cover;
+    background-position: center;
+    padding: 7rem 0;
+    margin-top: -1px;
+}
+
+.feature-card {
+    transition: all 0.3s ease;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.icon-circle {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    background: rgba(33, 150, 243, 0.1);
+}
+
+.icon-circle i {
+    font-size: 1.75rem;
+    color: #2196F3;
+}
+
+.quick-donate {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.04);
+}

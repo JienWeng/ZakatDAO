@@ -1,418 +1,311 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voucher Details - Zakat DAO</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
-    <style>
-        .voucher-id {
-            font-family: monospace;
-            font-size: 1.1em;
-            word-break: break-all;
-        }
-        .transaction-hash {
-            font-family: monospace;
-            font-size: 0.9em;
-        }
-        .transaction-in {
-            border-left: 4px solid #198754;
-        }
-        .transaction-out {
-            border-left: 4px solid #0d6efd;
-        }
-        .language-selector .dropdown-item.active {
-            background-color: #f8f9fa;
-            color: #212529;
-            font-weight: bold;
-        }
-        .language-selector .dropdown-toggle::after {
-            display: none;
-        }
-    </style>
-</head>
-<body>
-    {% include 'nav.html' %}
+{% extends "base.html" %}
 
-    <div class="container py-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 data-translate="voucher_details">Voucher Details</h1>
-            <a href="/ledger" class="btn btn-outline-secondary">&larr; <span data-translate="back_to_ledger">Back to Ledger</span></a>
+{% block title %}Voucher Details - Zakat DAO{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/voucher.css">
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 data-translate="voucher_details">Voucher Details</h1>
+        <a href="/ledger" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-2"></i>
+            <span data-translate="back_to_ledger">Back to Ledger</span>
+        </a>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Voucher ID</h5>
         </div>
-        
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5 class="mb-0">Voucher ID</h5>
-            </div>
-            <div class="card-body">
-                <div class="voucher-id bg-light p-3 rounded">{{ voucher.voucher_code }}</div>
-                
-                <div class="mt-4">
-                    <h5>Voucher Status</h5>
-                    {% if voucher.status == 'pending' %}
-                    <div class="alert alert-warning">
-                        <strong>Pending</strong> - Funds have been received but not yet disbursed
-                    </div>
-                    {% elif voucher.status == 'partially_disbursed' %}
-                    <div class="alert alert-info">
-                        <strong>Partially Disbursed</strong> - Some funds have been allocated to recipients
-                    </div>
-                    {% elif voucher.status == 'fully_disbursed' %}
-                    <div class="alert alert-success">
-                        <strong>Fully Disbursed</strong> - All funds have been allocated to recipients
-                    </div>
-                    {% else %}
-                    <div class="alert alert-secondary">
-                        <strong>Unknown</strong> - Unable to determine status
-                    </div>
-                    {% endif %}
+        <div class="card-body">
+            <div class="voucher-id bg-light p-3 rounded">{{ voucher.voucher_code }}</div>
+            
+            <div class="mt-4">
+                <h5>Voucher Status</h5>
+                {% if voucher.status == 'pending' %}
+                <div class="alert alert-warning">
+                    <strong>Pending</strong> - Funds have been received but not yet disbursed
                 </div>
-                
-                <div class="row mt-3">
-                    <div class="col-md-4">
-                        <div class="card bg-light">
-                            <div class="card-body">
-                                <h6 class="card-title">Total Donated</h6>
-                                <h3 class="text-success">${{ "%.2f"|format(voucher.total_donated) }}</h3>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card bg-light">
-                            <div class="card-body">
-                                <h6 class="card-title">Total Disbursed</h6>
-                                <h3 class="text-primary">${{ "%.2f"|format(voucher.total_disbursed) }}</h3>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card bg-light">
-                            <div class="card-body">
-                                <h6 class="card-title">Remaining Balance</h6>
-                                <h3 class="text-secondary">${{ "%.2f"|format(voucher.total_donated - voucher.total_disbursed) }}</h3>
-                            </div>
-                        </div>
-                    </div>
+                {% elif voucher.status == 'partially_disbursed' %}
+                <div class="alert alert-info">
+                    <strong>Partially Disbursed</strong> - Some funds have been allocated to recipients
                 </div>
-            </div>
-        </div>
-        
-        <div class="row">
-            <!-- Donations -->
-            <div class="col-md-6 mb-4">
-                <div class="card h-100">
-                    <div class="card-header bg-success text-white">
-                        <h5 class="mb-0">Donations</h5>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>Date</th>
-                                        <th>Donor</th>
-                                        <th>Amount</th>
-                                        <th>Cause</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% if voucher.donations %}
-                                        {% for tx in voucher.donations %}
-                                        <tr class="transaction-in">
-                                            <td>{{ tx.timestamp or 'N/A' }}</td>
-                                            <td>{{ tx.user or 'Anonymous' }}</td>
-                                            <td>${{ "%.2f"|format(tx.amount|float) if tx.amount else '0.00' }}</td>
-                                            <td>{{ tx.cause_name or 'Unknown' }}</td>
-                                        </tr>
-                                        {% endfor %}
-                                    {% else %}
-                                        <tr>
-                                            <td colspan="4" class="text-center py-3">No donation records found</td>
-                                        </tr>
-                                    {% endif %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                {% elif voucher.status == 'fully_disbursed' %}
+                <div class="alert alert-success">
+                    <strong>Fully Disbursed</strong> - All funds have been allocated to recipients
                 </div>
+                {% else %}
+                <div class="alert alert-secondary">
+                    <strong>Unknown</strong> - Unable to determine status
+                </div>
+                {% endif %}
             </div>
             
-            <!-- Disbursements -->
-            <div class="col-md-6 mb-4">
-                <div class="card h-100">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0">Disbursements</h5>
+            <div class="row mt-3">
+                <div class="col-md-4">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6 class="card-title">Total Donated</h6>
+                            <h3 class="text-success">${{ "%.2f"|format(voucher.total_donated) }}</h3>
+                        </div>
                     </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>Date</th>
-                                        <th>Recipient</th>
-                                        <th>Amount</th>
-                                        <th>Notes</th>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6 class="card-title">Total Disbursed</h6>
+                            <h3 class="text-primary">${{ "%.2f"|format(voucher.total_disbursed) }}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6 class="card-title">Remaining Balance</h6>
+                            <h3 class="text-secondary">${{ "%.2f"|format(voucher.total_donated - voucher.total_disbursed) }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Donations -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Donations</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Donor</th>
+                                    <th>Amount</th>
+                                    <th>Cause</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if voucher.donations %}
+                                    {% for tx in voucher.donations %}
+                                    <tr class="transaction-in">
+                                        <td>{{ tx.timestamp or 'N/A' }}</td>
+                                        <td>{{ tx.user or 'Anonymous' }}</td>
+                                        <td>${{ "%.2f"|format(tx.amount|float) if tx.amount else '0.00' }}</td>
+                                        <td>{{ tx.cause_name or 'Unknown' }}</td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    {% if voucher.disbursements %}
-                                        {% for tx in voucher.disbursements %}
-                                        <tr class="transaction-out">
-                                            <td>{{ tx.timestamp or 'N/A' }}</td>
-                                            <td>{{ tx.user or 'Anonymous' }}</td>
-                                            <td>${{ "%.2f"|format(tx.amount|float) if tx.amount else '0.00' }}</td>
-                                            <td>{{ tx.notes or 'No details provided' }}</td>
-                                        </tr>
-                                        {% endfor %}
-                                    {% else %}
-                                        <tr>
-                                            <td colspan="4" class="text-center py-3">No disbursement records yet</td>
-                                        </tr>
-                                    {% endif %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {% if voucher.recipient_summary %}
-        <div class="card mt-4">
-            <div class="card-header">
-                <h5 class="mb-0">Recipient Summary</h5>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table mb-0">
-                        <thead>
-                            <tr>
-                                <th>Recipient</th>
-                                <th>Total Received</th>
-                                <th>Last Disbursement</th>
-                                <th>Details</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for recipient_id, data in voucher.recipient_summary.items() %}
-                            <tr>
-                                <td>{{ data.name }}</td>
-                                <td>{{ format_amount(data.total_received) }}</td>
-                                <td>{{ data.disbursements[-1].timestamp }}</td>
-                                <td>
-                                    <button class="btn btn-sm btn-info" 
-                                            data-bs-toggle="collapse" 
-                                            data-bs-target="#recipient-{{ recipient_id }}">
-                                        View History
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr class="collapse" id="recipient-{{ recipient_id }}">
-                                <td colspan="4" class="p-0">
-                                    <table class="table table-sm mb-0 bg-light">
-                                        <thead>
-                                            <tr>
-                                                <th>Date</th>
-                                                <th>Amount</th>
-                                                <th>Type</th>
-                                                <th>Notes</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {% for tx in data.disbursements %}
-                                            <tr>
-                                                <td>{{ tx.timestamp }}</td>
-                                                <td>{{ format_amount(tx.amount) }}</td>
-                                                <td>{{ tx.disbursement_type }}</td>
-                                                <td>{{ tx.notes }}</td>
-                                            </tr>
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        {% endif %}
-        
-        <!-- Enhanced voucher download section with preview -->
-        <div class="card mt-4">
-            <div class="card-header">
-                <h5 class="mb-0">Zakat Voucher Certificate</h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="voucher-preview p-4 border rounded bg-light">
-                            <div class="text-center mb-3">
-                                <h4 class="text-success">Zakat DAO Voucher</h4>
-                                <p class="mb-1">Transaction ID: <strong>{{ voucher.donations[0].transaction_id if voucher.donations else 'N/A' }}</strong></p>
-                                <p class="mb-3">Amount: <strong>{{ format_amount(voucher.total_donated) }}</strong></p>
-                                
-                                <!-- QR Code placeholder -->
-                                <div class="qr-code-container my-3 border">
-                                    <img src="/api/qrcode/{{ voucher.voucher_code }}?v={{ range(1000) | random }}" 
-                                         alt="QR Code" 
-                                         class="img-fluid" 
-                                         style="max-width: 150px; height: auto;"
-                                         onerror="this.onerror=null; this.src='/static/img/qr-placeholder.png';">
-                                </div>
-                                
-                                <p class="voucher-id mb-0">{{ voucher.voucher_code }}</p>
-                            </div>
-                            <div class="mt-3 small text-center text-muted">
-                                <p class="mb-0">Scan QR code to verify authenticity</p>
-                                <p class="mb-0">Date: {{ voucher.donations[0].timestamp if voucher.donations else 'N/A' }}</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 d-flex flex-column justify-content-center">
-                        <h5>Your Zakat Voucher</h5>
-                        <p>This voucher represents your contribution to Zakat funds and can be used to track how your donation is being disbursed to recipients.</p>
-                        
-                        <div class="download-options mt-3">
-                            <a href="/download-voucher/{{ voucher.voucher_code }}?format=pdf" 
-                               class="btn btn-primary mb-2 w-100">
-                                <i class="bi bi-file-pdf"></i> Download as PDF
-                            </a>
-                            <a href="/download-voucher/{{ voucher.voucher_code }}?format=png" 
-                               class="btn btn-outline-secondary mb-2 w-100">
-                                <i class="bi bi-image"></i> Download as Image
-                            </a>
-                            <a href="/api/voucher/{{ voucher.voucher_code }}.json" 
-                               class="btn btn-outline-secondary w-100">
-                                <i class="bi bi-code-square"></i> Download as JSON
-                            </a>
-                        </div>
-                        
-                        <div class="mt-4">
-                            <h6>Share this voucher:</h6>
-                            <div class="input-group">
-                                <input type="text" 
-                                       class="form-control" 
-                                       value="{{ request.url_root }}voucher/{{ voucher.voucher_code }}" 
-                                       id="voucher-url" 
-                                       readonly>
-                                <button class="btn btn-outline-secondary" 
-                                        type="button" 
-                                        onclick="copyVoucherUrl()">
-                                    Copy
-                                </button>
-                            </div>
-                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="4" class="text-center py-3">No donation records found</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
         
-        <div class="mt-5">
-            <h3 data-translate="about_voucher_tracking">About Voucher Tracking</h3>
-            <p data-translate="tracking_description">The Zakat DAO platform allows you to track the full lifecycle of your donation from the initial contribution to the final disbursement to recipients. This transparency ensures that you can see exactly how your funds are being utilized.</p>
-            <p data-translate="voucher_info">Each voucher represents a donation and serves as a unique identifier in our system. The status of each voucher is updated in real-time as funds are disbursed to approved recipients.</p>
+        <!-- Disbursements -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Disbursements</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Recipient</th>
+                                    <th>Amount</th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if voucher.disbursements %}
+                                    {% for tx in voucher.disbursements %}
+                                    <tr class="transaction-out">
+                                        <td>{{ tx.timestamp or 'N/A' }}</td>
+                                        <td>{{ tx.user or 'Anonymous' }}</td>
+                                        <td>${{ "%.2f"|format(tx.amount|float) if tx.amount else '0.00' }}</td>
+                                        <td>{{ tx.notes or 'No details provided' }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="4" class="text-center py-3">No disbursement records yet</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <footer class="bg-light py-4 mt-5">
-        <div class="container text-center">
-            <p data-translate="footer_text">© 2023 Zakat DAO. This platform simulates blockchain/DAO behavior but does not use actual cryptocurrency.</p>
-            <p><small data-translate="footer_tagline">All donations are tracked in a transparent ledger system.</small></p>
+    {% if voucher.recipient_summary %}
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5 class="mb-0">Recipient Summary</h5>
         </div>
-    </footer>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Recipient</th>
+                            <th>Total Received</th>
+                            <th>Last Disbursement</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for recipient_id, data in voucher.recipient_summary.items() %}
+                        <tr>
+                            <td>{{ data.name }}</td>
+                            <td>{{ format_amount(data.total_received) }}</td>
+                            <td>{{ data.disbursements[-1].timestamp }}</td>
+                            <td>
+                                <button class="btn btn-sm btn-info" 
+                                        data-bs-toggle="collapse" 
+                                        data-bs-target="#recipient-{{ recipient_id }}">
+                                    View History
+                                </button>
+                            </td>
+                        </tr>
+                        <tr class="collapse" id="recipient-{{ recipient_id }}">
+                            <td colspan="4" class="p-0">
+                                <table class="table table-sm mb-0 bg-light">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Amount</th>
+                                            <th>Type</th>
+                                            <th>Notes</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for tx in data.disbursements %}
+                                        <tr>
+                                            <td>{{ tx.timestamp }}</td>
+                                            <td>{{ format_amount(tx.amount) }}</td>
+                                            <td>{{ tx.disbursement_type }}</td>
+                                            <td>{{ tx.notes }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
     
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5 class="mb-0">Zakat Voucher Certificate</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="voucher-preview p-4 border rounded bg-light">
+                        <div class="text-center mb-3">
+                            <h4 class="text-success">Zakat DAO Voucher</h4>
+                            <p class="mb-1">Transaction ID: <strong>{{ voucher.donations[0].transaction_id if voucher.donations else 'N/A' }}</strong></p>
+                            <p class="mb-3">Amount: <strong>{{ format_amount(voucher.total_donated) }}</strong></p>
+                            
+                            <div class="qr-code-container my-3 border">
+                                <img src="/api/qrcode/{{ voucher.voucher_code }}?v={{ range(1000) | random }}" 
+                                     alt="QR Code" 
+                                     class="img-fluid" 
+                                     style="max-width: 150px; height: auto;"
+                                     onerror="this.onerror=null; this.src='/static/img/qr-placeholder.png';">
+                            </div>
+                            
+                            <p class="voucher-id mb-0">{{ voucher.voucher_code }}</p>
+                        </div>
+                        <div class="mt-3 small text-center text-muted">
+                            <p class="mb-0">Scan QR code to verify authenticity</p>
+                            <p class="mb-0">Date: {{ voucher.donations[0].timestamp if voucher.donations else 'N/A' }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 d-flex flex-column justify-content-center">
+                    <h5>Your Zakat Voucher</h5>
+                    <p>This voucher represents your contribution to Zakat funds and can be used to track how your donation is being disbursed to recipients.</p>
+                    
+                    <div class="download-options mt-3">
+                        <a href="/download-voucher/{{ voucher.voucher_code }}?format=pdf" 
+                           class="btn btn-primary mb-2 w-100">
+                            <i class="bi bi-file-pdf"></i> Download as PDF
+                        </a>
+                        <a href="/download-voucher/{{ voucher.voucher_code }}?format=png" 
+                           class="btn btn-outline-secondary mb-2 w-100">
+                            <i class="bi bi-image"></i> Download as Image
+                        </a>
+                        <a href="/api/voucher/{{ voucher.voucher_code }}.json" 
+                           class="btn btn-outline-secondary w-100">
+                            <i class="bi bi-code-square"></i> Download as JSON
+                        </a>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h6>Share this voucher:</h6>
+                        <div class="input-group">
+                            <input type="text" 
+                                   class="form-control" 
+                                   value="{{ request.url_root }}voucher/{{ voucher.voucher_code }}" 
+                                   id="voucher-url" 
+                                   readonly>
+                            <button class="btn btn-outline-secondary" 
+                                    type="button" 
+                                    onclick="copyVoucherUrl()">
+                                Copy
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     
-    <script>
-        function copyVoucherUrl() {
-            const urlInput = document.getElementById('voucher-url');
-            urlInput.select();
-            document.execCommand('copy');
-            
-            // Show feedback
-            const button = urlInput.nextElementSibling;
-            const originalText = button.innerHTML;
-            button.innerHTML = 'Copied!';
-            button.classList.add('btn-success');
-            
-            setTimeout(() => {
-                button.innerHTML = originalText;
-                button.classList.remove('btn-success');
-            }, 2000);
-        }
-        
-        // Language toggle functionality
-        function setLanguage(lang) {
-            // Store language preference
-            localStorage.setItem('preferredLanguage', lang);
-            document.getElementById('currentLang').textContent = lang.toUpperCase();
-            
-            // Update active class
-            document.querySelectorAll('.language-selector .dropdown-item').forEach(item => {
-                if (item.textContent.toLowerCase().includes(lang)) {
-                    item.classList.add('active');
-                } else {
-                    item.classList.remove('active');
-                }
-            });
-            
-            // In a real app, this would reload the page or update content
-            console.log(`Language changed to ${lang}`);
-        }
-        
-        // Initialize language from stored preference
-        document.addEventListener('DOMContentLoaded', function() {
-            const storedLang = localStorage.getItem('preferredLanguage') || 'en';
-            document.getElementById('currentLang').textContent = storedLang.toUpperCase();
-            
-            // Set active class on the appropriate language
-            document.querySelectorAll('.language-selector .dropdown-item').forEach(item => {
-                if (item.textContent.toLowerCase().includes(storedLang)) {
-                    item.classList.add('active');
-                } else {
-                    item.classList.remove('active');
-                }
-            });
-        });
+    <div class="mt-5">
+        <h3 data-translate="about_voucher_tracking">About Voucher Tracking</h3>
+        <p data-translate="tracking_description">The Zakat DAO platform allows you to track the full lifecycle of your donation from the initial contribution to the final disbursement to recipients. This transparency ensures that you can see exactly how your funds are being utilized.</p>
+        <p data-translate="voucher_info">Each voucher represents a donation and serves as a unique identifier in our system. The status of each voucher is updated in real-time as funds are disbursed to approved recipients.</p>
+    </div>
+</div>
+{% endblock %}
 
-        // Additional translations specific for this page
-        const pageTranslations = {
-            'en': {
-                'voucher_details': 'Voucher Details',
-                'back_to_ledger': 'Back to Ledger',
-                'about_voucher_tracking': 'About Voucher Tracking',
-                'tracking_description': 'The Zakat DAO platform allows you to track the full lifecycle of your donation from the initial contribution to the final disbursement to recipients. This transparency ensures that you can see exactly how your funds are being utilized.',
-                'voucher_info': 'Each voucher represents a donation and serves as a unique identifier in our system. The status of each voucher is updated in real-time as funds are disbursed to approved recipients.',
-                'footer_tagline': 'All donations are tracked in a transparent ledger system.'
-            },
-            'my': {
-                'voucher_details': 'Butiran Baucar',
-                'back_to_ledger': 'Kembali ke Lejar',
-                'about_voucher_tracking': 'Mengenai Penjejakan Baucar',
-                'tracking_description': 'Platform Zakat DAO membolehkan anda menjejak kitaran lengkap sumbangan anda dari sumbangan awal hingga pengagihan akhir kepada penerima. Ketelusan ini memastikan anda dapat melihat dengan tepat bagaimana dana anda digunakan.',
-                'voucher_info': 'Setiap baucar mewakili sumbangan dan berfungsi sebagai pengenal pasti unik dalam sistem kami. Status setiap baucar dikemas kini secara masa nyata semasa dana disalurkan kepada penerima yang diluluskan.',
-                'footer_tagline': 'Semua sumbangan dijejak dalam sistem lejar yang telus.'
-            }
-        };
-
-        // Extend the translations object with page specific translations
-        document.addEventListener('DOMContentLoaded', function() {
-            // Merge page translations with main translations from nav.html
-            if (typeof translations !== 'undefined') {
-                for (const lang in pageTranslations) {
-                    if (translations[lang]) {
-                        translations[lang] = {...translations[lang], ...pageTranslations[lang]};
-                    }
-                }
-                
-                // Apply current language
-                const storedLang = localStorage.getItem('preferredLanguage') || 'en';
-                changeLanguage(storedLang);
-            }
-        });
-    </script>
-</body>
-</html>
+{% block extra_js %}
+<script>
+    function copyVoucherUrl() {
+        const urlInput = document.getElementById('voucher-url');
+        urlInput.select();
+        document.execCommand('copy');
+        
+        const button = urlInput.nextElementSibling;
+        button.innerHTML = 'Copied!';
+        button.classList.add('btn-success');
+        
+        setTimeout(() => {
+            button.innerHTML = 'Copy';
+            button.classList.remove('btn-success');
+        }, 2000);
+    }
+</script>
+{% endblock %}

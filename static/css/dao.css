@@ -1,0 +1,109 @@
+.governance-card {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+}
+
+.proposal-card {
+    transition: all 0.2s;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+}
+
+.proposal-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.vote-progress {
+    height: 8px;
+    border-radius: 12px;
+    background-color: rgba(0,0,0,0.05);
+}
+
+.filter-sidebar {
+    position: sticky;
+    top: 20px;
+}
+
+/* Allocation Controls */
+.allocation-slider {
+    height: 8px;
+    width: 100%;
+    -webkit-appearance: none;
+    background: #e9ecef;
+    border-radius: 4px;
+    margin: 1rem 0;
+}
+
+.allocation-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #2196F3;
+    cursor: pointer;
+    border: 2px solid #fff;
+    box-shadow: 0 0 2px rgba(0,0,0,0.2);
+}
+
+.allocation-slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #2196F3;
+    cursor: pointer;
+    border: 2px solid #fff;
+    box-shadow: 0 0 2px rgba(0,0,0,0.2);
+}
+
+.category-tag {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    margin: 0.25rem;
+    border-radius: 16px;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.category-tag:hover {
+    background: #e9ecef;
+}
+
+.category-tag.selected {
+    background: #2196F3;
+    color: white;
+    border-color: #2196F3;
+}
+
+.chart-comparison {
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+}
+
+.chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+/* Token Management Styles */
+.token-card {
+    transition: all 0.3s ease;
+}
+
+.token-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.token-balance {
+    background: -webkit-linear-gradient(45deg, #2196F3, #00BCD4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}

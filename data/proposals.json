@@ -15,7 +15,7 @@
     "created_by": "admin",
     "created_at": "2025-04-09T11:29:27.413370",
     "expires_at": "2025-04-10T11:29:27.413374",
-    "status": "active",
+    "status": "expired",
     "votes": {
       "authorities": {
         "admin": {
@@ -49,7 +49,7 @@
     "created_by": "admin",
     "created_at": "2025-04-09T11:34:50.961871",
     "expires_at": "2025-04-10T11:34:50.961875",
-    "status": "active",
+    "status": "expired",
     "votes": {
       "authorities": {
         "admin": {
@@ -190,7 +190,7 @@
     "created_by": "admin",
     "created_at": "2025-04-09T11:45:47.714936",
     "expires_at": "2025-04-10T11:45:47.714941",
-    "status": "active",
+    "status": "expired",
     "votes": {
       "authorities": {
         "null": {
@@ -201,5 +201,333 @@
       },
       "donors": {}
     }
+  },
+  "6da9f120a2724812": {
+    "id": "6da9f120a2724812",
+    "disbursement_data": {
+      "transaction_id": "tx9c44c61a",
+      "transaction_type": "OUT",
+      "amount": 200.0,
+      "timestamp": "2025-04-19 12:09:33",
+      "user": "RCP001",
+      "notes": "Disburse it",
+      "voucher_code": "",
+      "zakat_type_id": "2",
+      "recipient_id": "RCP001"
+    },
+    "created_by": "admin",
+    "created_at": "2025-04-19T12:09:33.169215",
+    "expires_at": "2025-04-20T12:09:33.169220",
+    "status": "approved",
+    "votes": {
+      "authorities": {
+        "admin": {
+          "vote": "approve",
+          "timestamp": "2025-04-19T12:09:33.170179",
+          "weight": 1.0
+        },
+        "null": {
+          "vote": "reject",
+          "timestamp": "2025-04-19T13:06:04.997455",
+          "weight": 1.0
+        }
+      },
+      "donors": {
+        "DONOR-9323ee6a": {
+          "vote": "approve",
+          "timestamp": "2025-04-19T13:30:54.614444",
+          "weight": 1.0
+        }
+      }
+    },
+    "final_decision": "approved"
+  },
+  "0b66ae1fb6414b8d": {
+    "id": "0b66ae1fb6414b8d",
+    "type": "allocation",
+    "allocation_type": "asnaf",
+    "current_state": {
+      "fakir": {
+        "percentage": 25,
+        "categories": [
+          "groceries",
+          "medical",
+          "education"
+        ]
+      },
+      "miskin": {
+        "percentage": 25,
+        "categories": [
+          "groceries",
+          "medical",
+          "education"
+        ]
+      },
+      "amil": {
+        "percentage": 12.5,
+        "categories": [
+          "operational"
+        ]
+      },
+      "muallaf": {
+        "percentage": 12.5,
+        "categories": [
+          "education",
+          "religious"
+        ]
+      },
+      "riqab": {
+        "percentage": 6.25,
+        "categories": [
+          "education",
+          "skills"
+        ]
+      },
+      "gharimin": {
+        "percentage": 6.25,
+        "categories": [
+          "debt_relief"
+        ]
+      },
+      "fisabilillah": {
+        "percentage": 6.25,
+        "categories": [
+          "religious",
+          "education"
+        ]
+      },
+      "ibnu_sabil": {
+        "percentage": 6.25,
+        "categories": [
+          "travel",
+          "emergency"
+        ]
+      }
+    },
+    "proposed_changes": {
+      "fakir": {
+        "percentage": 20.0,
+        "categories": [
+          "education"
+        ]
+      },
+      "miskin": {
+        "percentage": 30.0,
+        "categories": [
+          "groceries",
+          "medical",
+          "education"
+        ]
+      },
+      "amil": {
+        "percentage": 12.5,
+        "categories": [
+          "operational"
+        ]
+      },
+      "muallaf": {
+        "percentage": 12.5,
+        "categories": [
+          "education",
+          "religious"
+        ]
+      },
+      "riqab": {
+        "percentage": 6.5,
+        "categories": [
+          "education",
+          "skills"
+        ]
+      },
+      "gharimin": {
+        "percentage": 6.0,
+        "categories": [
+          "debt_relief"
+        ]
+      },
+      "fisabilillah": {
+        "percentage": 6.0,
+        "categories": [
+          "education",
+          "religious"
+        ]
+      },
+      "ibnu_sabil": {
+        "percentage": 6.5,
+        "categories": [
+          "travel",
+          "emergency"
+        ]
+      }
+    },
+    "created_by": "admin",
+    "created_at": "2025-04-19T12:27:00.775077",
+    "expires_at": "2025-04-20T12:27:00.775085",
+    "status": "active",
+    "votes": {
+      "authorities": {
+        "null": {
+          "vote": "approve",
+          "timestamp": "2025-04-19T12:54:27.290943",
+          "weight": 1.0
+        }
+      },
+      "donors": {
+        "DONOR-01c7d804": {
+          "vote": "reject",
+          "timestamp": "2025-04-19T14:12:54.215562",
+          "weight": 1.0
+        }
+      }
+    }
+  },
+  "137042deea97c545": {
+    "id": "137042deea97c545",
+    "type": "allocation",
+    "allocation_type": "asnaf",
+    "current_state": {
+      "fakir": {
+        "percentage": 25,
+        "categories": [
+          "groceries",
+          "medical",
+          "education"
+        ]
+      },
+      "miskin": {
+        "percentage": 25,
+        "categories": [
+          "groceries",
+          "medical",
+          "education"
+        ]
+      },
+      "amil": {
+        "percentage": 12.5,
+        "categories": [
+          "operational"
+        ]
+      },
+      "muallaf": {
+        "percentage": 12.5,
+        "categories": [
+          "education",
+          "religious"
+        ]
+      },
+      "riqab": {
+        "percentage": 6.25,
+        "categories": [
+          "education",
+          "skills"
+        ]
+      },
+      "gharimin": {
+        "percentage": 6.25,
+        "categories": [
+          "debt_relief"
+        ]
+      },
+      "fisabilillah": {
+        "percentage": 6.25,
+        "categories": [
+          "religious",
+          "education"
+        ]
+      },
+      "ibnu_sabil": {
+        "percentage": 6.25,
+        "categories": [
+          "travel",
+          "emergency"
+        ]
+      }
+    },
+    "proposed_changes": {
+      "fakir": {
+        "percentage": 30.0,
+        "categories": [
+          "groceries",
+          "medical",
+          "education",
+          "religious"
+        ]
+      },
+      "miskin": {
+        "percentage": 20.0,
+        "categories": [
+          "groceries",
+          "medical",
+          "education",
+          "operational"
+        ]
+      },
+      "amil": {
+        "percentage": 12.5,
+        "categories": [
+          "operational"
+        ]
+      },
+      "muallaf": {
+        "percentage": 12.5,
+        "categories": [
+          "education",
+          "religious"
+        ]
+      },
+      "riqab": {
+        "percentage": 6.5,
+        "categories": [
+          "education",
+          "skills"
+        ]
+      },
+      "gharimin": {
+        "percentage": 6.0,
+        "categories": [
+          "debt_relief"
+        ]
+      },
+      "fisabilillah": {
+        "percentage": 6.5,
+        "categories": [
+          "education",
+          "religious"
+        ]
+      },
+      "ibnu_sabil": {
+        "percentage": 6.0,
+        "categories": [
+          "travel",
+          "emergency"
+        ]
+      }
+    },
+    "created_by": "admin",
+    "created_at": "2025-04-19T12:32:16.630888",
+    "expires_at": "2025-04-20T12:32:16.630894",
+    "status": "approved",
+    "votes": {
+      "authorities": {
+        "null": {
+          "vote": "approve",
+          "timestamp": "2025-04-19T12:41:10.271462",
+          "weight": 1.0
+        }
+      },
+      "donors": {
+        "DONOR-9323ee6a": {
+          "vote": "reject",
+          "timestamp": "2025-04-19T13:38:02.662902",
+          "weight": 1.0
+        },
+        "DONOR-01c7d804": {
+          "vote": "approve",
+          "timestamp": "2025-04-19T14:12:41.249992",
+          "weight": 1.0
+        }
+      }
+    },
+    "final_decision": "approved"
   }
 }

@@ -253,6 +253,33 @@ GET /api/verify-chain
 
 ---
 
+## Deploying ZGT Token
+
+1. Install dependencies:
+```bash
+npm install --save-dev hardhat @nomiclabs/hardhat-waffle @nomiclabs/hardhat-etherscan dotenv
+```
+
+2. Set up environment variables in `.env`:
+- Get Alchemy API key from https://www.alchemy.com/
+- Get Polygonscan API key from https://polygonscan.com/
+- Add your wallet private key (without 0x prefix)
+
+3. Get test MATIC:
+- Visit https://faucet.polygon.technology/
+- Request test MATIC for Mumbai testnet
+
+4. Deploy contract:
+```bash
+npx hardhat run scripts/deploy.js --network mumbai
+```
+
+5. Verify on Mumbai Polygonscan:
+- Contract will be automatically verified
+- Visit https://mumbai.polygonscan.com/ to view
+
+---
+
 ## Contact
 
 - Report issues on GitHub

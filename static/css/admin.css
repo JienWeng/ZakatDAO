@@ -1,0 +1,36 @@
+.admin-card {
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+    transition: all 0.2s;
+}
+
+.admin-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.stats-card {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.chain-status {
+    background: linear-gradient(135deg, #f1f9ff 0%, #ffffff 100%);
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.login-container {
+    max-width: 400px;
+    margin: 60px auto;
+}
+
+.recipient-table th {
+    background: #f8f9fa;
+    font-weight: 600;
+}
+
+.priority-high { color: #dc3545; }
+.priority-medium { color: #ffc107; }
+.priority-low { color: #0dcaf0; }

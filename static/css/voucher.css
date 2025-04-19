@@ -1,0 +1,37 @@
+.voucher-id {
+    font-family: monospace;
+    font-size: 1.1em;
+    word-break: break-all;
+}
+
+.transaction-hash {
+    font-family: monospace;
+    font-size: 0.9em;
+}
+
+.transaction-in { border-left: 4px solid #198754; }
+.transaction-out { border-left: 4px solid #2196F3; }
+
+.voucher-preview {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border: 2px dashed #dee2e6;
+    border-radius: 12px;
+}
+
+.qr-code-container {
+    max-width: 200px;
+    margin: 0 auto;
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+}
+
+.download-options .btn {
+    transition: all 0.2s;
+}
+
+.download-options .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}

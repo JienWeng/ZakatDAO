@@ -1,0 +1,61 @@
+:root {
+  --zakat-primary: #2196F3;
+  --zakat-success: #4CAF50;
+  --zakat-info: #03A9F4;
+  --zakat-warning: #FFC107;
+  --zakat-danger: #F44336;
+}
+
+/* Common styles */
+.card {
+  border: none;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Forms */
+.form-control:focus, .form-select:focus {
+  box-shadow: 0 0 0 0.2rem rgba(33, 150, 243, 0.25);
+  border-color: var(--zakat-primary);
+}
+
+/* Buttons */
+.btn {
+  border-radius: 6px;
+  font-weight: 500;
+  padding: 0.5rem 1.25rem;
+}
+
+/* Spacing */
+.section-padding {
+  padding: 4rem 0;
+}
+
+/* Hero section */
+.hero {
+  background: linear-gradient(rgba(33, 150, 243, 0.9), rgba(33, 150, 243, 0.9)), url('/static/mosque.png');
+  background-size: cover;
+  padding: 6rem 0;
+}
+
+/* Tooltips and popovers */
+.tooltip {
+  font-size: 0.875rem;
+}
+
+/* Alerts */
+.alert {
+  border: none;
+  border-radius: 8px;
+}
+
+/* Progress bars */
+.progress {
+  height: 0.75rem;
+  border-radius: 1rem;
+}

@@ -1,130 +1,329 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Proposal Details - Zakat DAO</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-    {% include 'nav.html' %}
+{% extends "base.html" %}
 
-    <div class="container py-5">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h3 class="mb-0">
-                    {% if proposal.type == 'allocation' %}
-                    Allocation Proposal #{{ proposal.id[:8] }}
-                    {% else %}
-                    Disbursement Proposal #{{ proposal.id[:8] }}
-                    {% endif %}
-                </h3>
-                <span class="badge bg-{{ proposal.status == 'active' and 'primary' or (proposal.status == 'approved' and 'success' or 'danger') }}">
-                    {{ proposal.status|title }}
-                </span>
-            </div>
-            <div class="card-body">
-                <div class="row mb-4">
+{% block title %}
+    {% if proposal.type == 'allocation' %}
+        Allocation Proposal #{{ proposal.id[:8] }} - Zakat DAO
+    {% else %}
+        Disbursement Proposal #{{ proposal.id[:8] }} - Zakat DAO
+    {% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/dao.css">
+<style>
+    .vote-stats {
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        border-radius: 12px;
+        padding: 1.5rem;
+    }
+    .vote-progress {
+        height: 25px;
+        border-radius: 12px;
+        background-color: rgba(0,0,0,0.05);
+    }
+    .proposal-info dt {
+        color: #6c757d;
+        font-weight: 500;
+    }
+    .proposal-info dd {
+        margin-bottom: 1rem;
+    }
+    .chart-comparison {
+        background: #fff;
+        border-radius: 12px;
+        padding: 1.5rem;
+    }
+    .chart-container {
+        position: relative;
+        height: 300px;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="mb-2">
+                {% if proposal.type == 'allocation' %}
+                Allocation Proposal
+                {% else %}
+                Disbursement Proposal
+                {% endif %}
+            </h1>
+            <p class="lead text-muted mb-0">ID: {{ proposal.id[:8] }}</p>
+        </div>
+        <div>
+            <a href="{{ url_for('list_proposals') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-2"></i>Back to Proposals
+            </a>
+        </div>
+    </div>
+
+    <div class="card proposal-card mb-4">
+        <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+            <span class="text-muted">Status</span>
+            <span class="badge bg-{{ 
+                'primary' if proposal.status == 'active' else 
+                'success' if proposal.status == 'approved' else 
+                'danger' 
+            }}">{{ proposal.status|title }}</span>
+        </div>
+        <div class="card-body">
+            {% if proposal.type == 'allocation' %}
+            <div class="chart-comparison mb-4">
+                <h5 class="mb-4">Allocation Comparison</h5>
+                <div class="row">
                     <div class="col-md-6">
-                        <dl>
-                            {% if proposal.type == 'allocation' %}
-                            <dt>Type</dt>
-                            <dd>{{ proposal.allocation_type|title }} Allocation</dd>
-                            
-                            <dt>Current State</dt>
-                            <dd>
-                                {% for key, value in proposal.current_state.items() %}
-                                <div>{{ key|title }}: {{ value.percentage }}%</div>
-                                {% endfor %}
-                            </dd>
-                            
-                            <dt>Proposed Changes</dt>
-                            <dd>
-                                {% for key, value in proposal.proposed_changes.items() %}
-                                <div>
-                                    {{ key|title }}: {{ value.percentage }}%
-                                    <small class="text-muted d-block">
-                                        Categories: {{ value.categories|join(', ') }}
-                                    </small>
-                                </div>
-                                {% endfor %}
-                            </dd>
-                            {% else %}
-                            <dt>Recipient</dt>
-                            <dd>{{ proposal.disbursement_data.user }}</dd>
-                            
-                            <dt>Amount</dt>
-                            <dd>{{ format_amount(proposal.disbursement_data.amount) }}</dd>
-                            
-                            <dt>Notes</dt>
-                            <dd>{{ proposal.disbursement_data.notes or 'No notes provided' }}</dd>
-                            {% endif %}
-                        </dl>
+                        <div class="chart-container">
+                            <canvas id="currentChart"></canvas>
+                        </div>
+                        <p class="text-center mb-0">Current State</p>
                     </div>
                     <div class="col-md-6">
-                        <dl>
-                            <dt>Created By</dt>
-                            <dd>{{ proposal.created_by }}</dd>
-                            
-                            <dt>Created At</dt>
-                            <dd>{{ proposal.created_at }}</dd>
-                            
-                            <dt>Expires At</dt>
-                            <dd>{{ proposal.expires_at }}</dd>
-                        </dl>
+                        <div class="chart-container">
+                            <canvas id="proposedChart"></canvas>
+                        </div>
+                        <p class="text-center mb-0">Proposed Changes</p>
                     </div>
                 </div>
-
-                <!-- Voting Section -->
-                <div class="card bg-light">
-                    <div class="card-body">
-                        <h5>Votes</h5>
-                        
-                        <!-- Vote Progress -->
-                        <div class="mb-3">
-                            <div class="progress" style="height: 25px;">
-                                {% set authority_votes = proposal.votes.authorities|length %}
-                                {% set donor_votes = proposal.votes.donors|length %}
-                                {% set total_votes = authority_votes + donor_votes %}
-                                
-                                {% set authority_approves = proposal.votes.authorities|selectattr('vote', 'equalto', 'approve')|list|length %}
-                                {% set donor_approves = proposal.votes.donors|selectattr('vote', 'equalto', 'approve')|list|length %}
-                                
-                                {% set authority_ratio = authority_approves / authority_votes if authority_votes > 0 else 0 %}
-                                {% set donor_ratio = donor_approves / donor_votes if donor_votes > 0 else 0 %}
-                                
-                                {% set weighted_approval = (
-                                    (authority_ratio * 0.5 + donor_ratio * 0.5) * 100
-                                ) if total_votes > 0 else 0 %}
-                                
-                                <div class="progress-bar bg-success" 
-                                     style="width: {{ weighted_approval }}%" 
-                                     role="progressbar">
-                                    {{ "%.1f"|format(weighted_approval) }}% Approval
-                                </div>
+            </div>
+            {% endif %}
+            <div class="row g-4">
+                <div class="col-md-7">
+                    <div class="proposal-info">
+                        {% if proposal.type == 'allocation' %}
+                            <h5 class="mb-3">Current vs Proposed Allocation</h5>
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Asnaf Type</th>
+                                            <th>Current</th>
+                                            <th>Proposed</th>
+                                            <th>Categories</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for key, value in proposal.current_state.items() %}
+                                        <tr>
+                                            <td class="fw-medium">{{ key|title }}</td>
+                                            <td class="text-center">{{ value.percentage }}%</td>
+                                            <td class="text-center {% if value.percentage != proposal.proposed_changes[key].percentage %}text-primary fw-bold{% endif %}">
+                                                {{ proposal.proposed_changes[key].percentage }}%
+                                            </td>
+                                            <td>
+                                                {% for category in proposal.proposed_changes[key].categories %}
+                                                <span class="badge rounded-pill bg-light text-dark me-1">
+                                                    {{ category }}
+                                                </span>
+                                                {% endfor %}
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
                             </div>
-                            <small class="text-muted">
-                                {{ total_votes }} total votes ({{ authority_votes }} authorities, {{ donor_votes }} donors)
-                            </small>
+                        {% else %}
+                            <h5 class="mb-3">Disbursement Details</h5>
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <th style="width: 150px;">Recipient</th>
+                                        <td>{{ proposal.disbursement_data.user }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Amount</th>
+                                        <td>
+                                            <span class="h4 text-success mb-0">
+                                                {{ format_amount(proposal.disbursement_data.amount) }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Notes</th>
+                                        <td>
+                                            {% if proposal.disbursement_data.notes %}
+                                            <div class="border-start border-4 border-light ps-3">
+                                                {{ proposal.disbursement_data.notes }}
+                                            </div>
+                                            {% else %}
+                                            <em class="text-muted">No notes provided</em>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <div class="vote-stats">
+                        <h5 class="mb-3">Voting Progress</h5>
+                        {% set authority_votes = proposal.votes.authorities|length %}
+                        {% set donor_votes = proposal.votes.donors|length %}
+                        {% set total_votes = authority_votes + donor_votes %}
+                        
+                        {% set authority_approves = proposal.votes.authorities.values()|selectattr('vote', 'equalto', 'approve')|list|length %}
+                        {% set donor_approves = proposal.votes.donors.values()|selectattr('vote', 'equalto', 'approve')|list|length %}
+                        
+                        {% set authority_ratio = authority_approves / authority_votes if authority_votes > 0 else 0 %}
+                        {% set donor_ratio = donor_approves / donor_votes if donor_votes > 0 else 0 %}
+                        
+                        {% set weighted_approval = (authority_ratio * 50) + (donor_ratio * 50) %}
+
+                        <div class="vote-progress mb-3">
+                            <div class="progress-bar {% if weighted_approval >= 60 %}bg-success{% else %}bg-warning{% endif %}" 
+                                 style="width: {{ weighted_approval }}%" 
+                                 role="progressbar">
+                                {{ "%.1f"|format(weighted_approval) }}% Approval
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between text-muted mb-3">
+                            <div>
+                                <small>{{ total_votes }} total votes</small>
+                                <small class="text-muted">({{ authority_approves }}/{{ authority_votes }} auth, {{ donor_approves }}/{{ donor_votes }} donors)</small>
+                            </div>
+                            <div>
+                                <small class="{% if weighted_approval >= 60 %}text-success{% else %}text-warning{% endif %}">
+                                    {{ "%.1f"|format(authority_ratio * 100) }}% auth + {{ "%.1f"|format(donor_ratio * 100) }}% donor
+                                </small>
+                            </div>
                         </div>
 
-                        <!-- Vote Actions -->
                         {% if proposal.status == 'active' and (is_admin or is_donor) %}
-                        <form method="POST" action="{{ url_for('vote_on_proposal', proposal_id=proposal.id) }}" class="d-flex gap-2">
-                            <button type="submit" name="vote" value="approve" class="btn btn-success">
-                                Approve
-                            </button>
-                            <button type="submit" name="vote" value="reject" class="btn btn-danger">
-                                Reject
-                            </button>
-                        </form>
+                        <div class="d-grid gap-2">
+                            <form method="POST" action="{{ url_for('vote_on_proposal', proposal_id=proposal.id) }}" 
+                                  class="d-flex gap-2">
+                                <button type="submit" name="vote" value="approve" 
+                                        class="btn btn-success flex-grow-1">
+                                    <i class="bi bi-check-lg me-2"></i>Approve
+                                </button>
+                                <button type="submit" name="vote" value="reject" 
+                                        class="btn btn-outline-danger flex-grow-1">
+                                    <i class="bi bi-x-lg me-2"></i>Reject
+                                </button>
+                            </form>
+                        </div>
                         {% endif %}
+                    </div>
+
+                    <hr>
+
+                    <h6 class="mb-2">Votes</h6>
+                    <div class="table-responsive">
+                        <table class="table table-bordered align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Role</th>
+                                    <th>Voter</th>
+                                    <th>Decision</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for name, vote_info in proposal.votes.authorities.items() %}
+                                <tr>
+                                    <td>Authority</td>
+                                    <td><i class="bi bi-person-circle me-1"></i>{{ name }}</td>
+                                    <td>
+                                        {% if vote_info.vote == 'approve' %}
+                                            <span class="text-success fw-semibold">Approved</span>
+                                        {% elif vote_info.vote == 'reject' %}
+                                            <span class="text-danger fw-semibold">Rejected</span>
+                                        {% else %}
+                                            <span class="text-muted">No vote</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% for name, vote_info in proposal.votes.donors.items() %}
+                                <tr>
+                                    <td>Donor</td>
+                                    <td><i class="bi bi-person me-1"></i>{{ name }}</td>
+                                    <td>
+                                        {% if vote_info.vote == 'approve' %}
+                                            <span class="text-success fw-semibold">Approved</span>
+                                        {% elif vote_info.vote == 'reject' %}
+                                            <span class="text-danger fw-semibold">Rejected</span>
+                                        {% else %}
+                                            <span class="text-muted">No vote</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="card mt-4">
+                        <div class="card-body">
+                            <h6 class="mb-3">Timeline</h6>
+                            <div class="d-flex justify-content-between text-muted">
+                                <div>
+                                    <small>Created</small>
+                                    <div>{{ proposal.created_at }}</div>
+                                </div>
+                                <div class="text-end">
+                                    <small>Expires</small>
+                                    <div>{{ proposal.expires_at }}</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
+{% endblock %}
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+{% if proposal.type == 'allocation' %}
+const colors = ['#2196F3', '#4CAF50', '#FFC107', '#9C27B0', '#FF5722', '#795548', '#607D8B', '#3F51B5'];
+
+function createPieChart(elementId, data, title) {
+    const ctx = document.getElementById(elementId).getContext('2d');
+    return new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: Object.keys(data),
+            datasets: [{
+                data: Object.values(data).map(v => v.percentage),
+                backgroundColor: colors,
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 15
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.label}: ${context.raw}%`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    createPieChart('currentChart', {{ proposal.current_state|tojson }});
+    createPieChart('proposedChart', {{ proposal.proposed_changes|tojson }});
+});
+{% endif %}
+</script>
+{% endblock %}

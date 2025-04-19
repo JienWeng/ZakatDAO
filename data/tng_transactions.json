@@ -62,5 +62,13 @@
     "timestamp": "2025-04-09T11:49:08.341878",
     "status": "SUCCESS",
     "tng_reference": "TNG20250409114908"
+  },
+  {
+    "recipient_id": "RCP013",
+    "amount": 32.0,
+    "voucher_code": "d4294503-10ed-4fa5-afa6-49e6044abcaf",
+    "timestamp": "2025-04-19T13:07:41.415175",
+    "status": "SUCCESS",
+    "tng_reference": "TNG20250419130741"
   }
 ]

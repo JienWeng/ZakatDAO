@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}Governance Tokens - Zakat DAO{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/dao.css">
+<style>
+    .token-stats {
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        border-radius: 12px;
+        padding: 1.5rem;
+    }
+    .token-distribution {
+        height: 300px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="mb-2">Governance Tokens (ZGT)</h1>
+            <p class="lead text-muted mb-0">Track and manage voting power distribution</p>
+        </div>
+        {% if is_admin %}
+        <div class="d-flex gap-2">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#mintTokensModal">
+                <i class="bi bi-plus-circle me-2"></i>Mint Tokens
+            </button>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0">Token Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <div class="token-distribution">
+                        <canvas id="distributionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="token-stats mb-4">
+                <h5 class="mb-3">Token Stats</h5>
+                <div class="mb-3">
+                    <small class="text-muted d-block">Total Supply</small>
+                    <h3 class="mb-0">{{ total_supply }} ZGT</h3>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted d-block">Holders</small>
+                    <h3 class="mb-0">{{ holder_count }}</h3>
+                </div>
+                {% if is_donor or is_admin %}
+                <div class="mb-3">
+                    <small class="text-muted d-block">Your Balance</small>
+                    <h3 class="mb-0">{{ user_balance }} ZGT</h3>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="card">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0">Your Voting Power</h5>
+                </div>
+                <div class="card-body">
+                    <div class="progress mb-2" style="height: 10px;">
+                        <div class="progress-bar bg-primary" style="width: {{ voting_power }}%"></div>
+                    </div>
+                    <small class="text-muted">{{ voting_power }}% of total voting weight</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if is_admin %}
+<!-- Mint Tokens Modal -->
+<div class="modal fade" id="mintTokensModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Mint Governance Tokens</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('mint_tokens') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Recipient Address</label>
+                        <input type="text" class="form-control" name="recipient" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Amount</label>
+                        <input type="number" class="form-control" name="amount" min="1" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Reason</label>
+                        <select class="form-select" name="reason" required>
+                            <option value="donation">Donation Reward</option>
+                            <option value="contribution">Platform Contribution</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Mint Tokens</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('distributionChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: {{ holder_labels|tojson }},
+            datasets: [{
+                data: {{ holder_amounts|tojson }},
+                backgroundColor: [
+                    '#2196F3', '#4CAF50', '#FFC107', '#9C27B0',
+                    '#FF5722', '#795548', '#607D8B', '#3F51B5'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right'
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}
