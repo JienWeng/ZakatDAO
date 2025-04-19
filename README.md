@@ -51,7 +51,7 @@ The platform is designed to operate on a state-by-state basis, ensuring alignmen
 Welcome to the ZakatDAO hub! Here you can find important resources to better understand the platform:
 
 - [Solution Overview PDF](https://jienweng.netlify.app/assets/misc/report-ZakatDAO.pdf)
-- [Pitch Deck PDF](https://jienweng.netlify.app/assets/misc/ZakatDao-pitch.pdf)
+- [Pitch Deck PDF](https://github.com/JienWeng/ZakatDAO/blob/main/Documentations/ZakatDao-pitch.pdf)
 - [Live Demo](https://zakatdao.onrender.com)
 - [Explanation Video](link-to-video)
 
