@@ -1,8 +1,10 @@
 # ZakatDAO: Decentralized Zakat Distribution Platform
 
+🏆 **The Only Solo Award-Winning Project @ Universiti Malaya Hackathon 2025**
+
 *By Jien Weng*
 
-ZakatDAO is a pioneering decentralized platform designed to modernize and automate the distribution of zakat, ensuring **transparency**, **Shariah-compliance**, and **community-driven governance**. By leveraging blockchain technology, decentralized autonomous organization (DAO) governance, AI-driven prioritization powered by xAI, and e-wallet disbursement, ZakatDAO delivers a secure, efficient, and inclusive system for zakat management. This README provides a comprehensive overview of the platform, its objectives, technical architecture, deployment instructions, and governance model, with a focus on state-by-state implementation and the integration of xAI for prioritization.
+ZakatDAO is a pioneering decentralized platform designed to modernize and automate the distribution of zakat, ensuring **transparency**, **Shariah-compliance**, and **community-driven governance**. Recognized for its impactful and innovative approach at the Universiti Malaya Hackathon 2025, ZakatDAO leverages blockchain, DAO governance, and xAI prioritization to deliver a secure, efficient, and inclusive system for zakat management.
 
 [![ZakatDAO Image](img/banner.png)](https://zakatdao.onrender.com)
 
@@ -53,7 +55,6 @@ Welcome to the ZakatDAO hub! Here you can find important resources to better und
 - [Solution Overview PDF](https://jienweng.netlify.app/assets/misc/report-ZakatDAO.pdf)
 - [Pitch Deck PDF](https://github.com/JienWeng/ZakatDAO/blob/main/Documentations/ZakatDao-pitch.pdf)
 - [Live Demo](https://zakatdao.onrender.com)
-- [Explanation Video](link-to-video)
 
 Else, please find it under the [Documentations Folder](https://github.com/JienWeng/ZakatDAO/tree/main/Documentations).
 
